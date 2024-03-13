@@ -1,21 +1,16 @@
 const db = require("../utils/db");
 
-function Jurusan(jurusan) {
-    this.nama_jurusan = jurusan.nama_jurusan;
-    this.akronim = jurusan.akronim;
-} 
+class Jurusan{
+    static all(){
+        return new Promise((resolve, reject) => {
+            let q = "SELECT * FROM jurusan";
 
-Jurusan.all = (params, result) => {
-    let query = "SELECT * FROM jurusan";
-
-    db.query(query, (err, res) => {
-        if(err){
-            result(null, err);
-            return;
-        }
-
-        result(null, res);
-    });
+            db.query(q, (err, res) => {
+                if(err) reject(err);
+                else resolve(res);
+            });
+        })
+    }
 }
 
 module.exports = Jurusan;
