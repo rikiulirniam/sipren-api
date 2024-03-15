@@ -13,6 +13,7 @@ app.use('/jurusan', require('./routes/jurusan'));
 app.use('/kelas', require('./routes/kelas'));
 app.use('/mapel', require('./routes/mapel'));
 app.use('/materi', require('./routes/materi'));
+app.use('/siswa', require('./routes/siswa.js'));
 
 app.listen(port, () => {
   console.log(
