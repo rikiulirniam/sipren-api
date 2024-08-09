@@ -1,4 +1,4 @@
-const Presensi = require("../models/presensi")
+const Siswa = require("../models/siswa");
 
 module.exports = {
     /**
@@ -6,9 +6,10 @@ module.exports = {
      * @param {Response} res 
      * @returns 
      */
-    async index(req, res) {
-        const data = await Presensi.all();
 
-        return res.status(200).json({ data });
+    async index(req, res) {
+        const data = await Siswa.all();
+
+        return res.status(200).json({ data })
     }
 }
