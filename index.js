@@ -16,6 +16,8 @@ app.use('/materi', require('./routes/materi'));
 app.use('/presensi', require('./routes/presensi'));
 app.use('/guru', require('./routes/guru'));
 app.use('/siswa', require('./routes/siswa'));
+app.use('/tingkat', require('./routes/tingkat'));
+app.use('/users', require('./routes/users'));
 
 app.listen(port, () => {
   console.log(
