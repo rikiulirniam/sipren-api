@@ -5,14 +5,12 @@ const jwt = require("jsonwebtoken");
 
 
 //Login, Register, getUser, Logout
-//token hanya di generate waktu login
+//Accesstoken hanya di generate waktu login
 //token tidak disimpan dalam database bersamaan dengan kolom user dikarenakan akan melakukan update ketika login
 
 module.exports = {
     async login(req, res){
         const {username, password} = req.body;
-        // console.log(username);
-        // console.log(password);
     
         try{
             if(!username || !password){
@@ -89,13 +87,12 @@ module.exports = {
             console.error(err);
             res.status(500).json({ message: 'terjadi error pada server. '});
         }
-        // return res.status(200).json({ message: 'Aman' });
     },
 
-    async refreshToken(req, res){
+    async refreshToken(req, res){  // digunakan untuk re-Create AccessToken yang digunakan untuk login
         try{
             const refreshToken = req.cookies.refreshToken;
-            if(!refreshToken) return res.sendStatus(401);
+            if(!refreshToken) return res.status(401).json("anda tidak memiliki refreshToken");
             const user = await Users.findRefreshToken(refreshToken);
             if(!user[0]) return res.sendStatus(403);
             jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET, (err, decoded) => {
@@ -108,5 +105,16 @@ module.exports = {
         }catch(error){
             console.log(error);
         }
+    }, 
+
+    async logout(req, res){
+        const refreshToken = req.cookies.refreshToken;
+        if(!refreshToken) return res.sendStatus(204);
+        const user = await Users.findRefreshToken(refreshToken);
+        if(!user[0]) return res.sendStatus(204);
+        const userId = user[0].id_user;
+        await Users.refreshToken(null, userId);
+        res.clearCookie('refreshToken');
+        return res.status(200).json({message : "berhasil logout"});
     }
 }

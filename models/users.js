@@ -30,7 +30,7 @@ class Users{
         return new Promise((resolve, reject) => {
             let q = "SELECT * FROM user WHERE refresh_token = ?";
 
-            db.query(q, [username], (err, data) => {
+            db.query(q, [refreshToken], (err, data) => {
                 if(err) reject(err);
                 else resolve(data);
             })
