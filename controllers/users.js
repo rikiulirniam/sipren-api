@@ -22,10 +22,11 @@ module.exports = {
      */
 
     async register(req, res){
-        const {username , password, level, token, id_guru} = req.body;
+        const {id, username , password, level, token, id_guru} = req.body;
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
         await users.create([
+            id,
             username, 
             hashPassword,
             level,

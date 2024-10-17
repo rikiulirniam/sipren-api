@@ -1,10 +1,13 @@
 const express = require("express");
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT ;
 
+app.use(cookieParser)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -18,6 +21,7 @@ app.use('/guru', require('./routes/guru'));
 app.use('/siswa', require('./routes/siswa'));
 app.use('/tingkat', require('./routes/tingkat'));
 app.use('/users', require('./routes/users'));
+app.use('/auth', require('./routes/auth'));
 
 app.listen(port, () => {
   console.log(

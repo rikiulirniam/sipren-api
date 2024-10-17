@@ -5,20 +5,23 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node ."
+    "start": "node .",
+    "dev": "nodemon ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
+    "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
+    "nodemon": "^3.1.7",
     "sequelize": "^6.37.3"
   }
 }
