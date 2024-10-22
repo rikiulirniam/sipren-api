@@ -11,5 +11,7 @@ module.exports = {
         const data = await Siswa.all();
 
         return res.status(200).json({ data })
-    }
+    }, 
+
+    
 }

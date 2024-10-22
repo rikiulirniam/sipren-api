@@ -1,4 +1,5 @@
 const Users = require("../models/users")
+const Guru = require("../models/guru")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 // const { register } = require("./users");
@@ -24,6 +25,7 @@ module.exports = {
             }
     
             const user = userData[0];
+
     
             const isMatch = await bcrypt.compare(password, user.password);
     
@@ -31,25 +33,44 @@ module.exports = {
                 return res.status(401).json({ message: 'password salah.' });
             }
     
-            const accessToken = jwt.sign({ id: user.id_user, username: user.username}, process.env.ACCESS_JWT_SECRET, { expiresIn: '20s'});
+            const accessToken = jwt.sign({ id: user.id_user, username: user.username, level:user.level}, process.env.ACCESS_JWT_SECRET, { expiresIn: '600s'});
             const refreshToken = jwt.sign({ id: user.id_user, username: user.username}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
 
             await Users.refreshToken(refreshToken, user.id_user);
-
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000
             });
-
-            res.status(200).json({
-                message: 'login berhasil',
-                accessToken, 
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    level: user.level,
+            
+            if(user.level === 0){
+                const data = await Guru.find(user.id_user);
+                console.log(data);  // Periksa outputnya di server logs
+                if (!data) {
+                    return res.status(404).json({ message: "Guru tidak ditemukan" });
                 }
-            })
+                res.status(200).json({
+                    message: "Login berhasil sebagai guru",
+                    accessToken,
+                    user : {
+                        id_guru: data[0].id_guru,
+                        id_user: data[0].id_user,
+                        nama: data[0].nama_guru, 
+                        no_hp: data[0].no_hp
+                    }
+                })
+            }else{
+                res.status(200).json({
+                    message: 'login berhasil',
+                    accessToken, 
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        level: user.level,
+                    }
+                })
+            }
+
+
         }catch(err){
             console.error(err);
             res.status(500).json({ message: 'terjadi error pada server. '});
@@ -58,13 +79,12 @@ module.exports = {
 
 
     async register(req, res){
-        const {username, password, level, id_guru} = req.body;
+        const {username, password, level} = req.body;
         console.log(username);
         console.log(password);
         console.log(level);
-        console.log(id_guru);
         
-        if(!username || !password || !level || !id_guru){
+        if(!username || !password || level !== 0){
             return res.status(400).json({ message: 'error' });
         }
 
@@ -81,7 +101,7 @@ module.exports = {
         const hashPassword = await bcrypt.hash(password, salt);
 
         try{
-            await Users.create([ username, hashPassword, level, id_guru]);
+            await Users.create([ username, hashPassword, level]);
             res.status(200).json({ message: 'Register Success'});
         }catch(err){
             console.error(err);
@@ -89,23 +109,32 @@ module.exports = {
         }
     },
 
-    async refreshToken(req, res){  // digunakan untuk re-Create AccessToken yang digunakan untuk login
-        try{
-            const refreshToken = req.cookies.refreshToken;
-            if(!refreshToken) return res.status(401).json("anda tidak memiliki refreshToken");
-            const user = await Users.findRefreshToken(refreshToken);
-            if(!user[0]) return res.sendStatus(403);
-            jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET, (err, decoded) => {
-                if(err) return res.sendStatus(403);
-                const accessToken = jwt.sign({ id: user[0].id_user, username: user[0].username}, process.env.ACCESS_JWT_SECRET, { expiresIn: '20s'});
-                res.json([
-                    accessToken
-                ])
-            })
-        }catch(error){
-            console.log(error);
+    async refreshToken(req, res) {
+        // digunakan untuk re-Create AccessToken yang digunakan untuk login
+        try {
+          const refreshToken = req.cookies.refreshToken;
+          if (!refreshToken)
+            return res.status(401).json("anda tidak memiliki refreshToken");
+          const user = await Users.findRefreshToken(refreshToken);
+          if (!user[0]) return res.sendStatus(403);
+          jwt.verify(
+            refreshToken,
+            process.env.REFRESH_JWT_SECRET,
+            (err, decoded) => {
+              if (err) return res.sendStatus(403);
+              const accessToken = jwt.sign(
+                { id: user[0].id_user, username: user[0].username },
+                process.env.ACCESS_JWT_SECRET,
+                { expiresIn: "10000s" }
+              );
+              res.json({ token: accessToken });
+            }
+          );
+        } catch (error) {
+          console.log(error);
         }
-    }, 
+      }, 
+    
 
     async logout(req, res){
         const refreshToken = req.cookies.refreshToken;
@@ -116,5 +145,8 @@ module.exports = {
         await Users.refreshToken(null, userId);
         res.clearCookie('refreshToken');
         return res.status(200).json({message : "berhasil logout"});
-    }
+    },
+
+
+    //mendapatkan data user yang login dari token
 }
