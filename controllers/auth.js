@@ -33,7 +33,11 @@ module.exports = {
                 return res.status(401).json({ message: 'password salah.' });
             }
     
-            const accessToken = jwt.sign({ id: user.id_user, username: user.username, level:user.level}, process.env.ACCESS_JWT_SECRET, { expiresIn: '600s'});
+            const accessToken = jwt.sign(
+                { id: user.id_user, username: user.username, level: user.level },
+                process.env.ACCESS_JWT_SECRET,
+                { expiresIn: '600s' } // token akan kedaluwarsa setelah 600 detik
+            );
             const refreshToken = jwt.sign({ id: user.id_user, username: user.username}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
 
             await Users.refreshToken(refreshToken, user.id_user);
@@ -60,7 +64,7 @@ module.exports = {
                 })
             }else{
                 res.status(200).json({
-                    message: 'login berhasil',
+                    message: 'login berhasil sebagai admin',
                     accessToken, 
                     user: {
                         id: user.id,
