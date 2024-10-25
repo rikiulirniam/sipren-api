@@ -13,6 +13,7 @@ module.exports = {
 
         return res.json({ data });
     },
+    
     async create(req, res) {
         const { id_jurusan, tingkat, no_kelas } = req.body;
 
@@ -22,8 +23,9 @@ module.exports = {
             message: "berhasil insert kelas"
         })
     },
+
     async update(req, res) {
-        const { id_kelas} = req.query;
+        const { id_kelas} = req.params;
         const { id_jurusan, tingkat, no_kelas } = req.body;
 
         await Kelas.update(id_jurusan, tingkat, no_kelas, id_kelas);

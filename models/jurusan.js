@@ -1,7 +1,7 @@
 const db = require("../utils/db");
 
 class Jurusan{
-    static all(){
+    static  all(){
         return new Promise((resolve, reject) => {
             let q = "SELECT * FROM jurusan";
 

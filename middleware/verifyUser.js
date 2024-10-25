@@ -13,8 +13,9 @@ class Verify{
     }
 
     static verifyLevel = (req, res, next) => {
-        const user = req;
-        console.log(user);
+
+        const user = req.user;
+        console.log(user.level);
         if (user.level === 1) {
             return next(); 
         } else {

@@ -6,7 +6,7 @@ const { DataTypes } = Sequelize;
 class Users{
     static all(){
         return new Promise((resolve, reject)=> {
-            let q = "SELECT user.id_user, user.username, user.level, guru.nama_guru, user.create_date, user.update_date FROM user INNER JOIN guru ON guru.id_guru = user.id_guru"
+            let q = "SELECT user.id_user, user.username, user.level, guru.nama_guru, user.create_date, user.update_date FROM user INNER JOIN guru ON guru.id_user = user.id_user"
 
             db.query(q, (err, res)=> {
                 if(err) reject(err);

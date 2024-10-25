@@ -1,9 +1,9 @@
 const db = require('../utils/db');
 
 class Mapel {
-    static all(produktif = false) {
+    static detail(produktif = false) {
         return new Promise((resolve, reject) => {
-            let q = "SELECT id_mapel,nama_mapel FROM mapel";
+            let q = "SELECT id_mapel,nama_mapel, produktif FROM mapel";
 
             if (produktif == false) q += " WHERE produktif = 0";
             else if(produktif == true) q += " WHERE produktif = 1";
@@ -14,6 +14,10 @@ class Mapel {
                 resolve(data);
             })
         })
+    }
+
+    static all(){
+        return new Promise(re)
     }
 }
 
