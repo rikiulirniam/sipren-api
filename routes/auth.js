@@ -9,6 +9,5 @@ router.post('/login', auth.login);
 router.post('/register', auth.register);
 router.delete('/logout', auth.logout);
 router.get('/token', auth.refreshToken);
-router.get('/', verifyToken, auth.index);
 
 module.exports = router;

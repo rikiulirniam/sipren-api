@@ -1,25 +1,13 @@
 const express = require("express");
-const dotenv = require("dotenv");
-const cookieParser = require("cookie-parser");
-const cors = require("cors"); // Import middleware CORS
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
 
-// Konfigurasi CORS
-app.use(
-  cors({
-    origin: "*", // Izinkan permintaan dari frontend Vite
-    methods: ["GET", "POST", "PUT", "DELETE"], // Izinkan metode HTTP yang dibutuhkan
-    allowedHeaders: ["Content-Type", "Authorization"], // Headers yang diizinkan
-    credentials: true, // Jika kamu butuh mengirim cookie lintas origin
-  })
-);
-
-// Middleware untuk cookie, body parsing, dll.
-app.use(cookieParser());
+app.use(cookieParser()) 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,7 +26,5 @@ app.use("/auth", require("./routes/auth"));
 
 // Jalankan server
 app.listen(port, () => {
-  console.log(
-    "[server] server berhasil dijalankan di http://127.0.0.1:" + port
-  );
+  console.log("[server] server berhasil dijalankan di http://127.0.0.1/:" + port);
 });
