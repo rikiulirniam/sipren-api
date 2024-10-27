@@ -2,7 +2,7 @@ const Mapel = require('../models/mapel');
 
 module.exports = {
     async index(req, res) {
-        const { produktif } = req.query;
+        const { produktif } = req.params;
 
         const data = await Mapel.detail(produktif);
 

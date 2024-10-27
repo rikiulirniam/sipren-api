@@ -31,14 +31,14 @@ module.exports = {
     
             if(!isMatch) {
                 return res.status(401).json({ message: 'password salah.' });
-            }
+            }  
     
             const accessToken = jwt.sign(
                 { id: user.id_user, username: user.username, level: user.level },
                 process.env.ACCESS_JWT_SECRET,
                 { expiresIn: '600s' } // token akan kedaluwarsa setelah 600 detik
             );
-            const refreshToken = jwt.sign({ id: user.id_user, username: user.username}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
+            const refreshToken = jwt.sign({ id: user.id_user, username: user.username, level: user.level}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
 
             await Users.refreshToken(refreshToken, user.id_user);
             res.cookie('refreshToken', refreshToken, {
@@ -73,8 +73,6 @@ module.exports = {
                     }
                 })
             }
-
-
         }catch(err){
             console.error(err);
             res.status(500).json({ message: 'terjadi error pada server. '});
