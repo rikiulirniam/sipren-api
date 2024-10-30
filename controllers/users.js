@@ -49,7 +49,7 @@ module.exports = {
     async update(req, res){
         const {id_user} = req.params;
         console.log(id_user);
-        const {username, password} = req.body;
+        const {username, password, level} = req.body;
 
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
@@ -61,7 +61,7 @@ module.exports = {
                 return res.status(401).json({message: "user tidak ditemukan"})
             }
 
-            await Users.update(id_user, username, hashPassword);
+            await Users.update(id_user, username, hashPassword, level);
             return res.status(200).json({message: "berhasil update user"});
             
         }catch(err){

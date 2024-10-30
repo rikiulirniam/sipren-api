@@ -16,11 +16,11 @@ class Users {
     });
   }
   
-  static update(id_user, username, hashPassword){
+  static update(id_user, username, hashPassword, level){
     return new Promise((resolve, reject) => {
-      let q = "UPDATE user SET username = ?, password = ? WHERE id_user = ?";
+      let q = "UPDATE user SET username = ?, password = ?, level = ? WHERE id_user = ?";
 
-      db.query(q, [username, hashPassword, id_user], (err, res) => {
+      db.query(q, [username, hashPassword, level, id_user], (err, res) => {
         if(err) reject(err);
         else resolve(res);
       })
