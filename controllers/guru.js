@@ -1,5 +1,5 @@
 const Guru = require("../models/guru");
-const dayjs = require("dayjs")
+const dayjs = require("dayjs");
 
 module.exports = {
     async index(req, res){
