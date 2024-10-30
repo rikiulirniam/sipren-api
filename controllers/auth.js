@@ -1,8 +1,7 @@
 const Users = require("../models/users");
+const Guru = require("../models/guru");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { index } = require("./jurusan");
-const guru = require("./guru");
 // const { register } = require("./users");
 
 //Login, Register, getUser, Logout
@@ -10,78 +9,8 @@ const guru = require("./guru");
 //token tidak disimpan dalam database bersamaan dengan kolom user dikarenakan akan melakukan update ketika login
 
 module.exports = {
-  async index(req, res) {
-    const username = req.username.username;
-    const token = req.headers.authorization.split(" ")[1]; // Bearer token
-    // Mengambil ID pengguna dari token
-    try {
-      // Ambil data pengguna dari database menggunakan ID
-      const user = await Users.find(username);
-
-<<<<<<< HEAD
-      if (!user) {
-        return res.status(404).json({ message: "Pengguna tidak ditemukan" });
-      }
-      user[0].accessToken = token;
-      // Mengembalikan informasi pengguna sebagai respons
-      res.json({ user: user[0] }); // Sesuaikan dengan properti pengguna yang ingin ditampilkan
-      // res.json({ id: user.id, email: user.email, name: user.name }); // Sesuaikan dengan properti pengguna yang ingin ditampilkan
-    } catch (error) {
-      res.status(500).json({ message: "Server Error", error: error.message });
-    }
-  },
-
   async login(req, res) {
     const { username, password } = req.body;
-=======
-    
-            const isMatch = await bcrypt.compare(password, user.password);
-    
-            if(!isMatch) {
-                return res.status(401).json({ message: 'password salah.' });
-            }
-    
-            const accessToken = jwt.sign(
-                { id: user.id_user, username: user.username, level: user.level },
-                process.env.ACCESS_JWT_SECRET,
-                { expiresIn: '600s' } // token akan kedaluwarsa setelah 600 detik
-            );
-            const refreshToken = jwt.sign({ id: user.id_user, username: user.username}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
-
-            await Users.refreshToken(refreshToken, user.id_user);
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                maxAge: 24 * 60 * 60 * 1000
-            });
-            
-            if(user.level === 0){
-                const data = await Guru.find(user.id_user);
-                console.log(data);  // Periksa outputnya di server logs
-                if (!data) {
-                    return res.status(404).json({ message: "Guru tidak ditemukan" });
-                }
-                res.status(200).json({
-                    message: "Login berhasil sebagai guru",
-                    accessToken,
-                    user : {
-                        id_guru: data[0].id_guru,
-                        id_user: data[0].id_user,
-                        nama: data[0].nama_guru, 
-                        no_hp: data[0].no_hp
-                    }
-                })
-            }else{
-                res.status(200).json({
-                    message: 'login berhasil sebagai admin',
-                    accessToken, 
-                    user: {
-                        id: user.id,
-                        username: user.username,
-                        level: user.level,
-                    }
-                })
-            }
->>>>>>> 72734c128c23edbea21c6f8afbda8820514b0bbe
 
     try {
       if (!username || !password) {
@@ -107,7 +36,7 @@ module.exports = {
       const accessToken = jwt.sign(
         { id: user.id_user, username: user.username, level: user.level },
         process.env.ACCESS_JWT_SECRET,
-        { expiresIn: "10000s" }
+        { expiresIn: "600s" } // token akan kedaluwarsa setelah 600 detik
       );
       const refreshToken = jwt.sign(
         { id: user.id_user, username: user.username },
@@ -116,35 +45,51 @@ module.exports = {
       );
 
       await Users.refreshToken(refreshToken, user.id_user);
-
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
       });
 
-      res.status(200).json({
-        message: "login berhasil",
-        accessToken,
-        user: {
-          id: user.id,
-          username: user.username,
-          level: user.level,
-        },
-      });
+      if (user.level === 0) {
+        const data = await Guru.find(user.id_user);
+        console.log(data); // Periksa outputnya di server logs
+        if (!data) {
+          return res.status(404).json({ message: "Guru tidak ditemukan" });
+        }
+        res.status(200).json({
+          message: "Login berhasil sebagai guru",
+          accessToken,
+          user: {
+            id_guru: data[0].id_guru,
+            id_user: data[0].id_user,
+            nama: data[0].nama_guru,
+            no_hp: data[0].no_hp,
+          },
+        });
+      } else {
+        res.status(200).json({
+          message: "login berhasil sebagai admin",
+          accessToken,
+          user: {
+            id: user.id,
+            username: user.username,
+            level: user.level,
+          },
+        });
+      }
     } catch (err) {
       console.error(err);
-      res.status(500).json({ message: "terjadi error pada server. ", err });
+      res.status(500).json({ message: "terjadi error pada server. " });
     }
   },
 
   async register(req, res) {
-    const { username, password, level, id_guru } = req.body;
+    const { username, password, level } = req.body;
     console.log(username);
     console.log(password);
     console.log(level);
-    console.log(id_guru);
 
-    if (!username || !password || !level || !id_guru) {
+    if (!username || !password || level !== 0) {
       return res.status(400).json({ message: "error" });
     }
 
@@ -161,7 +106,7 @@ module.exports = {
     const hashPassword = await bcrypt.hash(password, salt);
 
     try {
-      await Users.create([username, hashPassword, level, id_guru]);
+      await Users.create([username, hashPassword, level]);
       res.status(200).json({ message: "Register Success" });
     } catch (err) {
       console.error(err);
@@ -191,7 +136,7 @@ module.exports = {
         }
       );
     } catch (error) {
-      res.json({ error: error });
+      console.log(error);
     }
   },
 
@@ -205,4 +150,6 @@ module.exports = {
     res.clearCookie("refreshToken");
     return res.status(200).json({ message: "berhasil logout" });
   },
+
+  //mendapatkan data user yang login dari token
 };
