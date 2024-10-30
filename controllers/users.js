@@ -88,5 +88,24 @@ module.exports = {
             console.error(err);
             return res.status(500).json({message: "terjadi error pada server"});
         }
-    }
+    },
+
+    async show(req, res) {
+        const { id_user } = req.params;
+        try {
+          const user = await Users.findById(id_user);
+      
+          if (!user) {
+            return res.status(404).json({ message: "User tidak ditemukan" });
+          }
+      
+          return res.status(200).json({
+            id_user: user.id_user,
+            username: user.username,
+            level: user.level,
+          });
+        } catch (err) {
+          return res.status(500).json({ message: "Terjadi error pada server" });
+        }
+      }
 }

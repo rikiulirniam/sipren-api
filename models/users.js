@@ -66,7 +66,7 @@ class Users {
 
       db.query(q, [id_user], (err, data) => {
         if (err) reject(err);
-        else resolve(data);
+        else resolve(data[0]);
       });
     });
   }
