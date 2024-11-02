@@ -1,9 +1,8 @@
-const Users = require("../models/users")
-const Guru = require("../models/guru")
+const Users = require("../models/users");
+const Guru = require("../models/guru");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 // const { register } = require("./users");
-
 
 //Login, Register, getUser, Logout
 //Accesstoken hanya di generate waktu login
@@ -40,115 +39,112 @@ module.exports = {
             );
             const refreshToken = jwt.sign({ id: user.id_user, username: user.username, level: user.level}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
 
-            await Users.refreshToken(refreshToken, user.id_user);
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                maxAge: 24 * 60 * 60 * 1000
-            });
-            
-            if(user.level === 0){
-                const data = await Guru.find(user.id_user);
-                console.log(data);  // Periksa outputnya di server logs
-                if (!data) {
-                    return res.status(404).json({ message: "Guru tidak ditemukan" });
-                }
-                res.status(200).json({
-                    message: "Login berhasil sebagai guru",
-                    accessToken,
-                    user : {
-                        id_guru: data[0].id_guru,
-                        id_user: data[0].id_user,
-                        nama: data[0].nama_guru, 
-                        no_hp: data[0].no_hp
-                    }
-                })
-            }else{
-                res.status(200).json({
-                    message: 'login berhasil sebagai admin',
-                    accessToken, 
-                    user: {
-                        id: user.id,
-                        username: user.username,
-                        level: user.level,
-                    }
-                })
-            }
-        }catch(err){
-            console.error(err);
-            res.status(500).json({ message: 'terjadi error pada server. '});
+      await Users.refreshToken(refreshToken, user.id_user);
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      if (user.level === 0) {
+        const data = await Guru.find(user.id_user);
+        console.log(data); // Periksa outputnya di server logs
+        if (!data) {
+          return res.status(404).json({ message: "Guru tidak ditemukan" });
         }
-    },
+        res.status(200).json({
+          message: "Login berhasil sebagai guru",
+          accessToken,
+          user: {
+            id_guru: data[0].id_guru,
+            id_user: data[0].id_user,
+            nama: data[0].nama_guru,
+            no_hp: data[0].no_hp,
+          },
+        });
+      } else {
+        res.status(200).json({
+          message: "login berhasil sebagai admin",
+          accessToken,
+          user: {
+            id: user.id,
+            username: user.username,
+            level: user.level,
+          },
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "terjadi error pada server. " });
+    }
+  },
 
+  async register(req, res) {
+    const { username, password, level } = req.body;
+    console.log(username);
+    console.log(password);
+    console.log(level);
 
-    async register(req, res){
-        const {username, password, level} = req.body;
-        console.log(username);
-        console.log(password);
-        console.log(level);
-        
-        if(!username || !password || level !== 0){
-            return res.status(400).json({ message: 'error' });
-        }
+    if (!username || !password || level !== 0) {
+      return res.status(400).json({ message: "error" });
+    }
 
-        if (password.length < 6) {
-            return res.status(400).json({ message: 'Password minimal 6 karakter.' });
-        }
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password minimal 6 karakter." });
+    }
 
-        const existingUser = await await Users.find(username);
-        if (existingUser.length > 0) {
-            return res.status(400).json({ message: 'Username sudah digunakan.' });
-        }
+    const existingUser = await await Users.find(username);
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "Username sudah digunakan." });
+    }
 
-        const salt = await bcrypt.genSalt();
-        const hashPassword = await bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
 
-        try{
-            await Users.create([ username, hashPassword, level]);
-            res.status(200).json({ message: 'Register Success'});
-        }catch(err){
-            console.error(err);
-            res.status(500).json({ message: 'terjadi error pada server. '});
-        }
-    },
+    try {
+      await Users.create([username, hashPassword, level]);
+      res.status(200).json({ message: "Register Success" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "terjadi error pada server. " });
+    }
+  },
 
-    async refreshToken(req, res) {
-        // digunakan untuk re-Create AccessToken yang digunakan untuk login
-        try {
-          const refreshToken = req.cookies.refreshToken;
-          if (!refreshToken)
-            return res.status(401).json("anda tidak memiliki refreshToken");
-          const user = await Users.findRefreshToken(refreshToken);
-          if (!user[0]) return res.sendStatus(403);
-          jwt.verify(
-            refreshToken,
-            process.env.REFRESH_JWT_SECRET,
-            (err, decoded) => {
-              if (err) return res.sendStatus(403);
-              const accessToken = jwt.sign(
-                { id: user[0].id_user, username: user[0].username },
-                process.env.ACCESS_JWT_SECRET,
-                { expiresIn: "10000s" }
-              );
-              res.json({ token: accessToken });
-            }
+  async refreshToken(req, res) {
+    // digunakan untuk re-Create AccessToken yang digunakan untuk login
+    try {
+      const refreshToken = req.cookies.refreshToken;
+      if (!refreshToken)
+        return res.status(401).json("anda tidak memiliki refreshToken");
+      const user = await Users.findRefreshToken(refreshToken);
+      if (!user[0]) return res.sendStatus(403);
+      jwt.verify(
+        refreshToken,
+        process.env.REFRESH_JWT_SECRET,
+        (err, decoded) => {
+          if (err) return res.sendStatus(403);
+          const accessToken = jwt.sign(
+            { id: user[0].id_user, username: user[0].username },
+            process.env.ACCESS_JWT_SECRET,
+            { expiresIn: "10000s" }
           );
-        } catch (error) {
-          console.log(error);
+          res.json({ token: accessToken });
         }
-      }, 
-    
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  },
 
-    async logout(req, res){
-        const refreshToken = req.cookies.refreshToken;
-        if(!refreshToken) return res.sendStatus(204);
-        const user = await Users.findRefreshToken(refreshToken);
-        if(!user[0]) return res.sendStatus(204);
-        const userId = user[0].id_user;
-        await Users.refreshToken(null, userId);
-        res.clearCookie('refreshToken');
-        return res.status(200).json({message : "berhasil logout"});
-    },
+  async logout(req, res) {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.sendStatus(204);
+    const user = await Users.findRefreshToken(refreshToken);
+    if (!user[0]) return res.sendStatus(204);
+    const userId = user[0].id_user;
+    await Users.refreshToken(null, userId);
+    res.clearCookie("refreshToken");
+    return res.status(200).json({ message: "berhasil logout" });
+  },
 
-
-    //mendapatkan data user yang login dari token
-}
+  //mendapatkan data user yang login dari token
+};
