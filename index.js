@@ -28,6 +28,7 @@ app.use('/kelas', require('./routes/kelas'));
 app.use('/mapel', require('./routes/mapel'));
 app.use('/materi', require('./routes/materi'));
 app.use('/presensi', require('./routes/presensi'));
+app.use('/det_presensi', require('./routes/detailPresensi'));
 app.use('/guru', require('./routes/guru'));
 app.use('/siswa', require('./routes/siswa'));
 app.use('/tingkat', require('./routes/tingkat'));

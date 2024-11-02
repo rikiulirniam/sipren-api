@@ -8,6 +8,7 @@ module.exports = {
      * @param {Response} res 
      * @returns 
      */
+    
     async all(req, res) {
         const data = await Presensi.all();
 
