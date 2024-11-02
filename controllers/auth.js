@@ -36,7 +36,7 @@ module.exports = {
       const accessToken = jwt.sign(
         { id: user.id_user, username: user.username, level: user.level },
         process.env.ACCESS_JWT_SECRET,
-        { expiresIn: "600s" } // token akan kedaluwarsa setelah 600 detik
+        { expiresIn: "27000s" } // token akan kedaluwarsa setelah 600 detik
       );
       const refreshToken = jwt.sign(
         { id: user.id_user, username: user.username },

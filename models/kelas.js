@@ -55,10 +55,24 @@ class Kelas {
       db.query(q, [id_kelas], (err, data) => {
         if (err) reject(err);
 
-        resolve(data);
-      });
-    });
-  }
+                resolve(data);
+            })
+        })
+    }
+
+    static find(tingkat, akronim, no_kelas) {
+        return new Promise((resolve, reject) => {
+            let q = "SELECT k.id_kelas, j.nama_jurusan, j.akronim, k.tingkat, k.no_kelas FROM kelas k INNER JOIN jurusan j WHERE k.tingkat = ? AND j.akronim = ? AND k.no_kelas = ?";
+            // let q = "SELECT * FROM kelas where tingkat = '?'";
+    
+            // Konversikan no_kelas menjadi angka (integer) jika perlu
+            db.query(q, [tingkat, akronim, parseInt(no_kelas)], (err, data) => {
+                if (err) return reject(err);
+                resolve(data);
+            });
+        });
+    }
+    
 }
 
 module.exports = Kelas;
