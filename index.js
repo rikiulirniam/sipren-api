@@ -1,8 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-const cors = require('cors'); // Import middleware CORS
-
+const cors = require("cors"); // Import middleware CORS
+const Verify = require("./middleware/verifyUser");
 
 dotenv.config();
 
@@ -28,12 +28,18 @@ app.use("/jurusan", require("./routes/jurusan"));
 app.use("/kelas", require("./routes/kelas"));
 app.use("/mapel", require("./routes/mapel"));
 app.use("/materi", require("./routes/materi"));
-app.use("/presensi", require("./routes/presensi"));
+app.use("/presensi", Verify.verifyToken, require("./routes/presensi"));
+app.use("/det_presensi", require("./routes/detailPresensi"));
 app.use("/guru", require("./routes/guru"));
 app.use("/siswa", require("./routes/siswa"));
 app.use("/tingkat", require("./routes/tingkat"));
-app.use("/users", require("./routes/users"));
-app.use("/auth", require("./routes/auth")); 
+app.use(
+  "/users",
+  Verify.verifyToken,
+  Verify.verifyLevel,
+  require("./routes/users")
+);
+app.use("/auth", require("./routes/auth"));
 
 // Jalankan server
 app.listen(port, () => {

@@ -46,44 +46,34 @@ module.exports = {
     }
   },
 
-  async show(req, res) {
-    const { id_user } = req.params;
-    try {
-      const user = await Users.findById(id_user);
-
-      if (user.length === 0) {
-        return res.status(401).json({ message: "user tidak ditemukan" });
-      }
-
-      return res.status(200).json({
-        message: "berhasil update user",
-        user: user
-      });
-    } catch (err) {
-      return res.status(500).json({ message: "terjadi error pada server" });
-    }
-  },
   async update(req, res) {
     const { id_user } = req.params;
-    const { username, password } = req.body;
-
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(password, salt);
-
+    const { username, password, level } = req.body;
+  
     try {
       const user = await Users.findById(id_user);
-
-      if (user.length === 0) {    
-        return res.status(401).json({ message: "user tidak ditemukan" });
+  
+      if (user.length === 0) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
       }
-
-      await Users.update(id_user, username, hashPassword);
-      return res.status(200).json({ message: "berhasil update user" });
+  
+      let hashPassword = user.password; // Gunakan password lama jika tidak ada password baru
+  
+      if (password) {
+        const salt = await bcrypt.genSalt();
+        hashPassword = await bcrypt.hash(password, salt);
+      }
+  
+      // Pastikan parameter sesuai dengan urutan yang diharapkan di model Users.update
+      await Users.update(id_user, username, hashPassword, level);
+  
+      return res.status(200).json({ message: "Berhasil update user" });
     } catch (err) {
       console.error(err);
-      return res.status(500).json({ message: "terjadi error pada server" });
+      return res.status(500).json({ message: "Terjadi error pada server" });
     }
-  },
+  }
+,  
 
   async delete(req, res) {
     const { id_user } = req.params;
@@ -102,6 +92,25 @@ module.exports = {
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: "terjadi error pada server" });
+    }
+  },
+
+  async show(req, res) {
+    const { id_user } = req.params;
+    try {
+      const user = await Users.findById(id_user);
+
+      if (!user) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
+      }
+
+      return res.status(200).json({
+        id_user: user.id_user,
+        username: user.username,
+        level: user.level,
+      });
+    } catch (err) {
+      return res.status(500).json({ message: "Terjadi error pada server" });
     }
   },
 };

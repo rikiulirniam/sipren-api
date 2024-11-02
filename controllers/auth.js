@@ -9,40 +9,35 @@ const jwt = require("jsonwebtoken");
 //token tidak disimpan dalam database bersamaan dengan kolom user dikarenakan akan melakukan update ketika login
 
 module.exports = {
-  async login(req, res) {
-    const { username, password } = req.body;
+    async login(req, res){
+        const {username, password} = req.body;
+    
+        try{
+            if(!username || !password){
+                return res.status(400).json({ message: 'Username dan password diperlukan' });
+            }
+    
+            const userData = await Users.find(username);
+    
+            if(userData.length === 0){
+                return res.status(401).json({message: 'User tidak ditemukan '});
+            }
+    
+            const user = userData[0];
 
-    try {
-      if (!username || !password) {
-        return res
-          .status(400)
-          .json({ message: "Username dan password diperlukan" });
-      }
-
-      const userData = await Users.find(username);
-
-      if (userData.length === 0) {
-        return res.status(401).json({ message: "User tidak ditemukan " });
-      }
-
-      const user = userData[0];
-
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        return res.status(401).json({ message: "password salah." });
-      }
-
-      const accessToken = jwt.sign(
-        { id: user.id_user, username: user.username, level: user.level },
-        process.env.ACCESS_JWT_SECRET,
-        { expiresIn: "27000s" } // token akan kedaluwarsa setelah 600 detik
-      );
-      const refreshToken = jwt.sign(
-        { id: user.id_user, username: user.username },
-        process.env.REFRESH_JWT_SECRET,
-        { expiresIn: "1d" }
-      );
+    
+            const isMatch = await bcrypt.compare(password, user.password);
+    
+            if(!isMatch) {
+                return res.status(401).json({ message: 'password salah.' });
+            }  
+    
+            const accessToken = jwt.sign(
+                { id: user.id_user, username: user.username, level: user.level },
+                process.env.ACCESS_JWT_SECRET,
+                { expiresIn: '27000s' } // token akan kedaluwarsa setelah 600 detik
+            );
+            const refreshToken = jwt.sign({ id: user.id_user, username: user.username, level: user.level}, process.env.REFRESH_JWT_SECRET, { expiresIn: '1d'});
 
       await Users.refreshToken(refreshToken, user.id_user);
       res.cookie("refreshToken", refreshToken, {
