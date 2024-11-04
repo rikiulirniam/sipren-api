@@ -61,23 +61,19 @@ class Kelas {
     });
   }
 
-  static find(tingkat, id_jurusan, no_kelas) {
-    return new Promise((resolve, reject) => {
-      let q =
-        "SELECT k.id_kelas, j.nama_jurusan, j.akronim, k.tingkat, k.no_kelas FROM kelas k INNER JOIN jurusan j WHERE k.tingkat = ? AND j.id_jurusan = ? AND k.no_kelas = ?";
-      // let q = "SELECT * FROM kelas where tingkat = '?'";
-
-      // Konversikan no_kelas menjadi angka (integer) jika perlu
-      db.query(
-        q,
-        [tingkat, parseInt(id_jurusan), parseInt(no_kelas)],
-        (err, data) => {
-          if (err) return reject(err);
-          resolve(data);
-        }
-      );
-    });
-  }
+    static find(id_kelas) {
+        return new Promise((resolve, reject) => {
+            let q = "SELECT k.id_kelas, j.nama_jurusan, j.akronim, k.tingkat, k.no_kelas FROM kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.id_kelas = ?;";
+            // let q = "SELECT * FROM kelas where tingkat = '?'";
+    
+            // Konversikan no_kelas menjadi angka (integer) jika perlu
+            db.query(q, [id_kelas], (err, data) => {
+                if (err) return reject(err);
+                resolve(data);
+            });
+        });
+    }
+    
 }
 
 module.exports = Kelas;

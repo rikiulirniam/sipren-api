@@ -16,11 +16,11 @@ module.exports = {
     },
 
     async create(req, res){
-        const {id_materi, id_guru, id_kelas, deskripsi} = req.body;
+        const {id_materi, id_user, id_kelas, deskripsi} = req.body;
         const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-        const data = await Presensi.create([id_materi, id_guru, id_kelas, deskripsi, currentDateTime]);
 
+        const data = await Presensi.create([id_materi, id_user, id_kelas, deskripsi, currentDateTime]);
         res.status(200).json({
             message: "berhasil input presensi"
         })
@@ -37,10 +37,10 @@ module.exports = {
                 message: "presensi tidak ditemukan"
             })
         }else{
-            const {id_materi, id_guru, id_kelas, deskripsi} = req.body;
+            const {id_materi, id_user, id_kelas, deskripsi} = req.body;
             const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     
-            await Presensi.update(id_materi, id_guru, id_kelas, deskripsi, currentDateTime, id_presensi);
+            await Presensi.update(id_materi, id_user, id_kelas, deskripsi, currentDateTime, id_presensi);
     
             res.status(200).json({
                 message: "berhasil update presensi"
