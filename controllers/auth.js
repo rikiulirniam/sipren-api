@@ -25,7 +25,6 @@ module.exports = {
             }
     
             const user = userData[0];
-
     
             const isMatch = await bcrypt.compare(password, user.password);
     
@@ -47,19 +46,14 @@ module.exports = {
             });
             
             if(user.level === 0){
-                const data = await Guru.find(user.id_user);
-                console.log(data);  // Periksa outputnya di server logs
-                if (!data) {
-                    return res.status(404).json({ message: "Guru tidak ditemukan" });
-                }
                 res.status(200).json({
                     message: "Login berhasil sebagai guru",
                     accessToken,
                     user : {
-                        id_guru: data[0].id_guru,
-                        id_user: data[0].id_user,
-                        nama: data[0].nama_guru, 
-                        no_hp: data[0].no_hp
+                        id_user : user.id_user,
+                        username : user.username,
+                        nama : user.nama,
+                        level : user.level
                     }
                 })
             }else{
@@ -67,8 +61,9 @@ module.exports = {
                     message: 'login berhasil sebagai admin',
                     accessToken, 
                     user: {
-                        id: user.id,
+                        id_user: user.id_user,
                         username: user.username,
+                        nama : user.nama,
                         level: user.level,
                     }
                 })
@@ -81,12 +76,10 @@ module.exports = {
 
 
     async register(req, res){
-        const {username, password, level} = req.body;
-        console.log(username);
-        console.log(password);
-        console.log(level);
+        const {username, nama, password, level} = req.body;
+        console.log(nama)
         
-        if(!username || !password || level !== 0){
+        if(!username || !nama|| !password || level !== 0){
             return res.status(400).json({ message: 'error' });
         }
 
@@ -103,7 +96,7 @@ module.exports = {
         const hashPassword = await bcrypt.hash(password, salt);
 
         try{
-            await Users.create([ username, hashPassword, level]);
+            await Users.create([ username, nama, hashPassword, level]);
             res.status(200).json({ message: 'Register Success'});
         }catch(err){
             console.error(err);
@@ -112,7 +105,6 @@ module.exports = {
     },
 
     async refreshToken(req, res) {
-        // digunakan untuk re-Create AccessToken yang digunakan untuk login
         try {
           const refreshToken = req.cookies.refreshToken;
           if (!refreshToken)

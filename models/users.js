@@ -29,7 +29,7 @@ class Users {
 
   static create(values) {
     return new Promise((resolve, reject) => {
-      let q = "INSERT INTO user(username, password, level) VALUES (?)";
+      let q = "INSERT INTO user(username, nama, password, level) VALUES (?)";
 
       db.query(q, [values], (err, data) => {
         if (err) reject(err);
