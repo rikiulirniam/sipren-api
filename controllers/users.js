@@ -21,7 +21,7 @@ module.exports = {
     console.log(password);
     console.log(level);
 
-    if (!username || !password || level !== 0) {
+    if (!username || !password) {
       return res.status(400).json({ message: "error" });
     }
 
