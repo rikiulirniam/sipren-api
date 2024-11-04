@@ -1,9 +1,8 @@
-const Users = require("../models/users")
-const Guru = require("../models/guru")
+const Users = require("../models/users");
+const Guru = require("../models/guru");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 // const { register } = require("./users");
-
 
 //Login, Register, getUser, Logout
 //Accesstoken hanya di generate waktu login
@@ -83,20 +82,20 @@ module.exports = {
             return res.status(400).json({ message: 'error' });
         }
 
-        if (password.length < 6) {
-            return res.status(400).json({ message: 'Password minimal 6 karakter.' });
-        }
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password minimal 6 karakter." });
+    }
 
-        const existingUser = await await Users.find(username);
-        if (existingUser.length > 0) {
-            return res.status(400).json({ message: 'Username sudah digunakan.' });
-        }
+    const existingUser = await await Users.find(username);
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "Username sudah digunakan." });
+    }
 
-        const salt = await bcrypt.genSalt();
-        const hashPassword = await bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
 
         try{
-            await Users.create([ username, nama, hashPassword, level]);
+            await Users.create([ username, hashPassword, level]);
             res.status(200).json({ message: 'Register Success'});
         }catch(err){
             console.error(err);
@@ -105,6 +104,7 @@ module.exports = {
     },
 
     async refreshToken(req, res) {
+        // digunakan untuk re-Create AccessToken yang digunakan untuk login
         try {
           const refreshToken = req.cookies.refreshToken;
           if (!refreshToken)
@@ -142,5 +142,5 @@ module.exports = {
     },
 
 
-    //mendapatkan data user yang login dari token
-}
+  //mendapatkan data user yang login dari token
+};
