@@ -1,3 +1,6 @@
+const Kelas = require("../models/kelas");
+const Mapel = require("../models/mapel");
+const Materi = require("../models/materi");
 const Presensi = require("../models/presensi");
 const dayjs = require("dayjs");
 
@@ -16,9 +19,15 @@ module.exports = {
     },
 
     async create(req, res){
-        const {id_materi, id_user, id_kelas, deskripsi} = req.body;
+        const {id_kelas, id_user, id_mapel ,materi, deskripsi} = req.body;
         const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
+
+
+        const id_materi = await Materi.create([id_mapel, materi, deskripsi]);
+        console.log(id_materi);
+
+        const data = await Presensi.create([id_materi, id_user, id_kelas, "", currentDateTime]);
 
         const data = await Presensi.create([id_materi, id_user, id_kelas, deskripsi, currentDateTime]);
         res.status(200).json({
@@ -66,12 +75,16 @@ module.exports = {
     },
 
     async index(req, res){
-        const {id_kelas} = req.query;
-
-        const data = await Presensi.findByKelas(id_kelas);
-
-        res.status(200).json({
-            data
-        })
+        try {
+            const { id_kelas } = req.query;
+            console.log("tesss");
+            console.log("id_kelas:", id_kelas); // Pastikan ini muncul
+    
+            const data = await Presensi.findByKelas(id_kelas);
+            res.status(200).json({ data });
+        } catch (error) {
+            console.error("Error in index function:", error);
+            res.status(500).json({ message: "Terjadi kesalahan" });
+        }
     }
 }

@@ -17,13 +17,13 @@ module.exports = {
 
   async create(req, res) {
     const { username, nama, password, level } = req.body;
-
     if (!username || !password) {
       return res.status(400).json({ message: "Lengkapi Form!" });
     }
 
     if (!nama) {
       return res.status(400).json({ message: "Nama minimal 4 karakter." });
+
     }
 
     if (password.length < 6) {
@@ -49,8 +49,9 @@ module.exports = {
 
   async update(req, res) {
     const { id_user } = req.params;
-    const { username, password, level } = req.body;
 
+    const { username, nama, password, level } = req.body;
+    
     try {
       const user = await Users.findById(id_user);
 
@@ -66,7 +67,8 @@ module.exports = {
       }
 
       // Pastikan parameter sesuai dengan urutan yang diharapkan di model Users.update
-      await Users.update(id_user, username, hashPassword, level);
+
+      await Users.update(id_user, username, nama, hashPassword, level);
 
       return res.status(200).json({ message: "Berhasil update user" });
     } catch (err) {
