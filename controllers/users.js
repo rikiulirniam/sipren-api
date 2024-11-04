@@ -16,12 +16,12 @@ module.exports = {
   },
 
   async create(req, res) {
-    const { username, password, level } = req.body;
+    const { username, nama, password, level } = req.body;
     console.log(username);
     console.log(password);
     console.log(level);
 
-    if (!username || !password || level !== 0) {
+    if (!username || !nama || !password || level !== 0) {
       return res.status(400).json({ message: "error" });
     }
 
@@ -38,7 +38,7 @@ module.exports = {
     const hashPassword = await bcrypt.hash(password, salt);
 
     try {
-      await Users.create([username, hashPassword, level]);
+      await Users.create([username, nama, hashPassword, level]);
       return res.status(200).json({ message: "Create User berhasil" });
     } catch (err) {
       console.error(err);
@@ -48,7 +48,8 @@ module.exports = {
 
   async update(req, res) {
     const { id_user } = req.params;
-    const { username, password, level } = req.body;
+    const { username, nama, password, level } = req.body;
+    console.log(nama);
   
     try {
       const user = await Users.findById(id_user);
@@ -65,7 +66,7 @@ module.exports = {
       }
   
       // Pastikan parameter sesuai dengan urutan yang diharapkan di model Users.update
-      await Users.update(id_user, username, hashPassword, level);
+      await Users.update(id_user, username, nama, hashPassword, level);
   
       return res.status(200).json({ message: "Berhasil update user" });
     } catch (err) {

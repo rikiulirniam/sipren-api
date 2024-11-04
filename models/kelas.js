@@ -72,6 +72,17 @@ class Kelas {
             });
         });
     }
+
+    static getIdKelas(tingkat, id_jurusan, no_kelas){
+      return new Promise((resolve, reject) => {
+        let q = "SELECT k.id_kelas from kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.tingkat = ? AND k.id_jurusan = ? AND k.no_kelas = ?";
+
+        db.query(q, [tingkat, id_jurusan, no_kelas], (err, data) => {
+          if(err) return reject(err);
+        resolve(data[0].id_kelas);
+        })
+      })
+    }
     
 }
 

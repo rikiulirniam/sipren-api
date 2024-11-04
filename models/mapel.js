@@ -27,6 +27,17 @@ class Mapel {
         })
     }
 
+    static getIdMapel(nama_mapel){
+        return new Promise((resolve, reject) => {
+            let q = "SELECT id_mapel FROM mapel WHERE nama_mapel = ?";
+
+            db.query(q, [nama_mapel], (err, data) => {
+                if(err) reject(err);
+                resolve(data[0].id_mapel);
+            })
+        })
+    }
+
     
 }
 
