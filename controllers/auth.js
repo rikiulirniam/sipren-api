@@ -95,7 +95,7 @@ module.exports = {
     const hashPassword = await bcrypt.hash(password, salt);
 
         try{
-            await Users.create([ username, hashPassword, level]);
+            await Users.create([ username, nama, hashPassword, level]);
             res.status(200).json({ message: 'Register Success'});
         }catch(err){
             console.error(err);
