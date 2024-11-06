@@ -67,7 +67,6 @@ module.exports = {
       }
 
       // Pastikan parameter sesuai dengan urutan yang diharapkan di model Users.update
-
       await Users.update(id_user, username, nama, hashPassword, level);
 
       return res.status(200).json({ message: "Berhasil update user" });
@@ -105,11 +104,7 @@ module.exports = {
         return res.status(404).json({ message: "User tidak ditemukan" });
       }
 
-      return res.status(200).json({
-        id_user: user.id_user,
-        username: user.username,
-        level: user.level,
-      });
+      return res.status(200).json(user);
     } catch (err) {
       return res.status(500).json({ message: "Terjadi error pada server" });
     }
