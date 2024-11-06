@@ -49,7 +49,7 @@ module.exports = {
 
   async update(req, res) {
     const { id_user } = req.params;
-    const { username, password, level } = req.body;
+    const { username, nama, password, level } = req.body;
 
     try {
       const user = await Users.findById(id_user);
@@ -66,7 +66,7 @@ module.exports = {
       }
 
       // Pastikan parameter sesuai dengan urutan yang diharapkan di model Users.update
-      await Users.update(id_user, username, hashPassword, level);
+      await Users.update(id_user, username, nama, hashPassword, level);
 
       return res.status(200).json({ message: "Berhasil update user" });
     } catch (err) {
@@ -103,11 +103,7 @@ module.exports = {
         return res.status(404).json({ message: "User tidak ditemukan" });
       }
 
-      return res.status(200).json({
-        id_user: user.id_user,
-        username: user.username,
-        level: user.level,
-      });
+      return res.status(200).json(user);
     } catch (err) {
       return res.status(500).json({ message: "Terjadi error pada server" });
     }
