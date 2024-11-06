@@ -18,6 +18,10 @@ module.exports = {
 
         try{
             const data = await Siswa.find(id_kelas);
+            // console.log(data.length);
+            // for(const item of data){
+            //     console.log(item.nama)
+            // }
 
             if(data.length === 0){
                 return res.status(404).json({message: "tidak menemukan data"})

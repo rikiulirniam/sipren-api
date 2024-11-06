@@ -18,7 +18,13 @@ class Presensi{
 
             db.query(q, [values], (err, res) => {
                 if(err) reject(err);
-                else resolve(res);
+
+                if(res && res.insertId){
+                    resolve(res.insertId)
+                }else{
+                    reject(new Error("tidak dapat mengembalikan id"))
+                }
+                
             })
         })
     } 

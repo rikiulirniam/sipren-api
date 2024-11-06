@@ -3,6 +3,8 @@ const Mapel = require("../models/mapel");
 const Materi = require("../models/materi");
 const Presensi = require("../models/presensi");
 const dayjs = require("dayjs");
+const Siswa = require("../models/siswa");
+const DetailPresensi = require("../models/detailPresensi");
 
 
 module.exports = {
@@ -22,14 +24,16 @@ module.exports = {
         const {id_kelas, id_user, id_mapel ,materi, deskripsi} = req.body;
         const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-
-
         const id_materi = await Materi.create([id_mapel, materi, deskripsi]);
         console.log(id_materi);
-
+        
         const data = await Presensi.create([id_materi, id_user, id_kelas, "", currentDateTime]);
+        const siswa = await Siswa.find(id_kelas)
 
-        const data = await Presensi.create([id_materi, id_user, id_kelas, deskripsi, currentDateTime]);
+        for(const item of siswa){
+            await DetailPresensi.create([data, item.nis, "T"])
+        }
+        // const data = await Presensi.create([id_materi, id_user, id_kelas, deskripsi, currentDateTime]);
         res.status(200).json({
             message: "berhasil input presensi"
         })
