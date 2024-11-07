@@ -28,4 +28,14 @@ module.exports = {
       data: det,
     });
   },
+
+  async updateKeterangan(req, res){
+    const {rfid} = req.body;
+
+    const data = await DetailPresensi.UpdateKeterangan(rfid);
+
+    return res.status(200).json({
+      message: "success update"
+    })
+  }
 };
