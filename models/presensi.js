@@ -14,7 +14,7 @@ class Presensi{
 
     static create(values){
         return new Promise((resolve, reject) => {
-            let q = "INSERT INTO presensi(`id_materi`, `id_user`, `id_kelas`, , `hari_tanggal`) VALUES(?)"
+            let q = "INSERT INTO presensi(`id_materi`, `id_user`, `id_kelas`, `jam_started` , `jam_ended` , `hari_tanggal`) VALUES(?)"
 
             db.query(q, [values], (err, res) => {
                 if(err) reject(err);

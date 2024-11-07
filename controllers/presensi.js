@@ -21,13 +21,13 @@ module.exports = {
     },
 
     async create(req, res){
-        const {id_kelas, id_user, id_mapel, jam_started , jam_ended ,materi} = req.body;
+        const {id_kelas, id_user, id_mapel, jam_started , jam_ended ,materi, deskripsi} = req.body;
         const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-        const id_materi = await Materi.create([id_mapel,  materi]);
+        const id_materi = await Materi.create([id_mapel,  materi, deskripsi]);
         console.log(id_materi);
         
-        const data = await Presensi.create([id_materi, id_user, id_kelas, currentDateTime]);
+        const data = await Presensi.create([id_materi, id_user, id_kelas, jam_started , jam_ended , currentDateTime]);
         const siswa = await Siswa.find(id_kelas)
 
         for(const item of siswa){
@@ -35,7 +35,11 @@ module.exports = {
         }
         // const data = await Presensi.create([id_materi, id_user, id_kelas, deskripsi, currentDateTime]);
         res.status(200).json({
-            message: "berhasil input presensi"
+            message: "berhasil input presensi",
+            data : {
+                id_presensi : data
+            }
+            
         })
     }, 
 
