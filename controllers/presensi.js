@@ -65,13 +65,12 @@ module.exports = {
         });
       }
 
-      const siswa = await Siswa.find(id_kelas);
-
-      for (const item of siswa) {
+      const siswa = await Siswa.findByKelas(id_kelas);
+      for (let item of siswa) {
         await DetailPresensi.create([data, item.nis, "T"]);
       }
       // const data = await Presensi.create([id_materi, id_user, id_kelas, deskripsi, currentDateTime]);
-      res.status(200).json({
+      return res.status(200).json({
         message: "berhasil input presensi",
         data: {
           id_presensi: data,
@@ -131,7 +130,7 @@ module.exports = {
   async index(req, res) {
     try {
       const { id_kelas } = req.query;
-      console.log("tesss");
+      // console.log("tesss");
       console.log("id_kelas:", id_kelas); // Pastikan ini muncul
 
       const data = await Presensi.findByKelas(id_kelas);
@@ -139,6 +138,24 @@ module.exports = {
     } catch (error) {
       console.error("Error in index function:", error);
       res.status(500).json({ message: "Terjadi kesalahan" });
+    }
+  },
+
+  async detail(req, res) {
+    try {
+      const { id_presensi } = req.query;
+      console.log(id_presensi);
+
+      const dataPresensi = await Presensi.findByPresensi(id_presensi);
+      const dataDetailPresensi = await DetailPresensi.find(id_presensi);
+      console.log(dataDetailPresensi);
+
+      dataPresensi[0].detailPresensi = dataDetailPresensi;
+      return res.status(200).json({
+        Presensi: dataPresensi,
+      });
+    } catch (err) {
+      return res.status(500).json({ message: "error" });
     }
   },
 };

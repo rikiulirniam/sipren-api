@@ -16,7 +16,7 @@ class Siswa {
   static create(values) {
     return new Promise((resolve, reject) => {
       let q =
-        "INSERT INTO siswa(nis, rfid, nama, jenis_kelamin, no_hp, id_kelas) VALUES (?)";
+        "INSERT INTO siswa(nis, rfid, nama, jenis_kelamin, id_kelas) VALUES (?)";
 
       db.query(q, [values], (err, res) => {
         if (err) reject(err);
@@ -67,6 +67,35 @@ class Siswa {
       `;
 
       db.query(query, [nis], (err, results) => {
+        if (err) {
+          console.error("Database query error:", err); // Log error untuk debugging
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+  static findByKelas(id_kelas) {
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT 
+          siswa.nis, 
+          siswa.rfid, 
+          siswa.nama, 
+          siswa.jenis_kelamin, 
+          jurusan.akronim, 
+          kelas.tingkat, 
+          kelas.no_kelas, 
+          siswa.create_date, 
+          siswa.update_date 
+        FROM siswa 
+        INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas 
+        INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan 
+        WHERE siswa.id_kelas = ?
+      `;
+
+      db.query(query, [id_kelas], (err, results) => {
         if (err) {
           console.error("Database query error:", err); // Log error untuk debugging
           reject(err);
