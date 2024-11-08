@@ -22,13 +22,33 @@ module.exports = {
 
     async create(req, res){
         const {id_kelas, id_user, id_mapel, jam_started , jam_ended ,materi, deskripsi} = req.body;
+
+        if(!id_kelas || !id_user, !id_mapel || !jam_started || !jam_ended || !materi || !deskripsi){
+            return res.status(500).json({
+                message: "input data tidak valid"
+            })
+        }
+
         const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
         const id_materi = await Materi.create([id_mapel,  materi, deskripsi]);
         console.log(id_materi);
+
+        if(!id_materi){
+            return res.status(500).jsos({
+                message: "can't get data"
+            })
+        }
         
         const data = await Presensi.create([id_materi, id_user, id_kelas, jam_started , jam_ended , currentDateTime]);
+        if(!data){
+            return res.status(500).json({
+                message: "can't get data"
+            })
+        }
+
         const siswa = await Siswa.find(id_kelas)
+        
 
         for(const item of siswa){
             await DetailPresensi.create([data, item.nis, "T"])

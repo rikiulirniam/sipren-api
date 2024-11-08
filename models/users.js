@@ -18,6 +18,8 @@ class Users {
 
   static update(id_user, username, nama, hashPassword, level) {
     return new Promise((resolve, reject) => {
+      // let q =
+      //   "UPDATE user SET username = ? , nama = ?, password = ?, level = ? WHERE id_user = ?";
       let q =
         "UPDATE user SET username = ?, nama = ?, password = ?, level = ? WHERE id_user = ?";
 
