@@ -7,9 +7,9 @@ module.exports = {
    * @param {Response} res
    */
   async index(req, res) {
-    const { id_jurusan, tingkat } = req.query;
+    const { id_jurusan, tingkat, no_kelas } = req.query;
 
-    const data = await Kelas.all(id_jurusan, tingkat);
+    const data = await Kelas.all(id_jurusan, tingkat, no_kelas);
 
     return res.json({ data });
   },
@@ -36,14 +36,11 @@ module.exports = {
       return res.status(400).json({ message: "no_kelas melewati batas" });
     }
 
-    if (!["x", "XI", "XII"].includes[tingkat]) {
-      return res.status(400).json({ message: "tingkat tidak sesuai" });
-    }
-
     const data = await Kelas.create([id_jurusan, tingkat, no_kelas]);
 
     return res.status(200).json({
       message: "berhasil insert kelas",
+      data: data.id_kelas,
     });
   },
 
@@ -69,10 +66,10 @@ module.exports = {
   },
 
   async detail(req, res) {
-    const { tingkat, id_jurusan, no_kelas } = req.query;
-    console.log(tingkat, id_jurusan, no_kelas);
+    const { id_kelas } = req.query;
+    // console.log(tingkat, akronim, no_kelas);
 
-    const data = await Kelas.find(tingkat, id_jurusan, no_kelas);
+    const data = await Kelas.find(id_kelas);
     // const { id_jurusan, tingkat } = req.query;
     // console.log(id_jurusan, tingkat);
     return res.status(200).json({
