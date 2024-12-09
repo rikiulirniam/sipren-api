@@ -1,7 +1,7 @@
 const db = require("../utils/db");
 
 class Kelas {
-  static all(id_jurusan, tingkat) {
+  static all(id_jurusan, tingkat, no_kelas) {
     return new Promise((resolve, reject) => {
       let q =
         "SELECT k.id_kelas, j.nama_jurusan, j.akronim, k.tingkat, k.no_kelas FROM kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan";
@@ -14,6 +14,11 @@ class Kelas {
         q +=
           (q[q.length - 1] == "n" ? " WHERE" : " AND") +
           ` k.tingkat = '${tingkat}'`;
+
+      if (no_kelas)
+        q +=
+          (q[q.length - 1] == "n" ? " WHERE" : " AND") +
+          ` k.no_kelas = '${no_kelas}'`;
 
       db.query(q, (err, data) => {
         if (err) reject(err);
@@ -30,8 +35,12 @@ class Kelas {
 
       db.query(q, [values], (err, data) => {
         if (err) reject(err);
+        const selectQuery = "SELECT id_kelas FROM kelas WHERE id_kelas = ?";
+        db.query(selectQuery, [data.insertId], (err, data) => {
+          if (err) return reject(err);
 
-        resolve(data);
+          resolve(data); // Data pertama yang ditemukan
+        });
       });
     });
   }
@@ -75,15 +84,16 @@ class Kelas {
     });
   }
 
-  static getIdKelas(tingkat, id_jurusan, no_kelas){
+  static getIdKelas(tingkat, id_jurusan, no_kelas) {
     return new Promise((resolve, reject) => {
-      let q = "SELECT k.id_kelas from kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.tingkat = ? AND k.id_jurusan = ? AND k.no_kelas = ?";
+      let q =
+        "SELECT k.id_kelas from kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.tingkat = ? AND k.id_jurusan = ? AND k.no_kelas = ?";
 
       db.query(q, [tingkat, id_jurusan, no_kelas], (err, data) => {
-        if(err) return reject(err);
-      resolve(data[0].id_kelas);
-      })
-    })
+        if (err) return reject(err);
+        resolve(data[0].id_kelas);
+      });
+    });
   }
 }
 

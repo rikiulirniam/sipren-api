@@ -7,9 +7,9 @@ module.exports = {
    * @param {Response} res
    */
   async index(req, res) {
-    const { id_jurusan, tingkat } = req.query;
+    const { id_jurusan, tingkat, no_kelas } = req.query;
 
-    const data = await Kelas.all(id_jurusan, tingkat);
+    const data = await Kelas.all(id_jurusan, tingkat, no_kelas);
 
     return res.json({ data });
   },
@@ -40,6 +40,7 @@ module.exports = {
 
     return res.status(200).json({
       message: "berhasil insert kelas",
+      data: data.id_kelas,
     });
   },
 

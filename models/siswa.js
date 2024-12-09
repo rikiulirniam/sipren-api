@@ -4,7 +4,7 @@ class Siswa {
   static all() {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT siswa.nis, siswa.rfid, siswa.nama, siswa.jenis_kelamin, jurusan.akronim, kelas.tingkat, kelas.no_kelas, siswa.create_date, siswa.update_date FROM siswa INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
+        "SELECT siswa.nis, siswa.rfid, siswa.nama, jurusan.akronim, kelas.tingkat, kelas.no_kelas, siswa.create_date, siswa.update_date FROM siswa INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
 
       db.query(q, (err, res) => {
         if (err) reject(err);
@@ -15,8 +15,7 @@ class Siswa {
 
   static create(values) {
     return new Promise((resolve, reject) => {
-      let q =
-        "INSERT INTO siswa(nis, rfid, nama, jenis_kelamin, id_kelas) VALUES (?)";
+      let q = "INSERT INTO siswa(nis, rfid, nama, id_kelas) VALUES (?)";
 
       db.query(q, [values], (err, res) => {
         if (err) reject(err);
@@ -25,12 +24,11 @@ class Siswa {
     });
   }
 
-  static update(rfid, nama, jenis_kelamin, nis) {
+  static update(rfid, nama, nis) {
     return new Promise((resolve, reject) => {
-      let q =
-        "UPDATE siswa SET rfid = ?, nama = ?, jenis_kelamin = ? WHERE nis = ?";
+      let q = "UPDATE siswa SET rfid = ?, nama = ? WHERE nis = ?";
 
-      db.query(q, [rfid, nama, jenis_kelamin, nis], (err, res) => {
+      db.query(q, [rfid, nama, nis], (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
@@ -54,7 +52,6 @@ class Siswa {
           siswa.nis, 
           siswa.rfid, 
           siswa.nama, 
-          siswa.jenis_kelamin, 
           jurusan.akronim, 
           kelas.tingkat, 
           kelas.no_kelas, 
@@ -83,7 +80,6 @@ class Siswa {
           siswa.nis, 
           siswa.rfid, 
           siswa.nama, 
-          siswa.jenis_kelamin, 
           jurusan.akronim, 
           kelas.tingkat, 
           kelas.no_kelas, 

@@ -30,16 +30,10 @@ module.exports = {
   },
 
   async create(req, res) {
-    const { nis, rfid, nama, jenis_kelamin, id_kelas } = req.body;
+    const { nis, rfid, nama, id_kelas } = req.body;
 
     try {
-      const data = await Siswa.create([
-        nis,
-        rfid,
-        nama,
-        jenis_kelamin,
-        id_kelas,
-      ]);
+      const data = await Siswa.create([nis, rfid, nama, id_kelas]);
       return res.status(200).json({ message: "berhasil create siswa" });
     } catch (err) {
       console.log(err);
@@ -50,10 +44,10 @@ module.exports = {
   async update(req, res) {
     const { nis } = req.params;
 
-    const { rfid, nama, jenis_kelamin } = req.body;
+    const { rfid, nama } = req.body;
 
     try {
-      const data = await Siswa.update(rfid, nama, jenis_kelamin, nis);
+      const data = await Siswa.update(rfid, nama, nis);
       return res.status(200).json({
         message: "Berhasil update data",
       });
