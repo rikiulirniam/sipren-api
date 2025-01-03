@@ -15,6 +15,10 @@ module.exports = {
 
     async create(req, res){
         const {id_user, nama_guru, no_hp} = req.body;
+        if(!id_user || !nama_guru || !no_hp){
+            return res.status(400).json({ message: 'error!!' });
+        }
+        
         const currentDateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
         await Guru.create([id_user, nama_guru, no_hp, currentDateTime]);
 

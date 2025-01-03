@@ -141,6 +141,5 @@ module.exports = {
         return res.status(200).json({message : "berhasil logout"});
     },
 
-
   //mendapatkan data user yang login dari token
 };

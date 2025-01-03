@@ -10,6 +10,9 @@ module.exports = {
      */
     async store(req, res) {
         const { id_mapel, nama_materi, deskripsi } = req.body;
+        if(!id_mapel || !nama_materi || !deskripsi){
+            return res.status(400).json({ message: 'error!!' });
+        }
 
         const data = await Materi.create([id_mapel, nama_materi, deskripsi]);
 
@@ -27,6 +30,9 @@ module.exports = {
      */
     async show(req, res) {
         const { id_materi } = req.params;
+        if(!id_materi){
+            return res.status(400).json({ message: 'error!!' });
+        }
 
         const data = await Materi.show(id_materi);
 
