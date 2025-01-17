@@ -4,8 +4,7 @@ class Presensi {
   static all() {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT materi.nama_materi, materi.deskripsi , user.nama, kelas.id_kelas ,  kelas.no_kelas, jurusan.akronim, kelas.tingkat, presensi.jam_started, presensi.jam_ended , presensi.hari_tanggal, presensi.create_date, presensi.update_date FROM presensi INNER JOIN materi ON presensi.id_materi = materi.id_materi INNER JOIN user ON presensi.id_user = user.id_user INNER JOIN kelas ON presensi.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan";
-
+        "SELECT materi.nama_materi, materi.deskripsi , user.nama, kelas.id_kelas ,  kelas.no_kelas, jurusan.akronim, kelas.tingkat, presensi.jam_started, presensi.jam_ended , presensi.hari_tanggal, presensi.create_date, presensi.update_date FROM presensi INNER JOIN materi ON presensi.id_materi = materi.id_materi INNER JOIN user ON presensi.id_user = user.id_user INNER JOIN kelas ON presensi.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
       db.query(q, (err, res) => {
         if (err) reject(err);
         else resolve(res);

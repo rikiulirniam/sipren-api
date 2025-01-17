@@ -1,12 +1,28 @@
 const db = require("../utils/db");
 
 class Siswa {
-  static all() {
+  static all(id_kelas) {
     return new Promise((resolve, reject) => {
-      let q =
-        "SELECT siswa.nis, siswa.rfid, siswa.nama, jurusan.akronim, kelas.tingkat, kelas.no_kelas, siswa.create_date, siswa.update_date FROM siswa INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
+      let q = `
+        SELECT 
+          siswa.nis, siswa.rfid, siswa.nama, jurusan.akronim, 
+          kelas.id_kelas, kelas.tingkat, kelas.no_kelas, 
+          siswa.create_date, siswa.update_date 
+        FROM 
+          siswa 
+        INNER JOIN 
+          kelas ON siswa.id_kelas = kelas.id_kelas 
+        INNER JOIN 
+          jurusan ON kelas.id_jurusan = jurusan.id_jurusan
+      `;
 
-      db.query(q, (err, res) => {
+      const params = [];
+      if (id_kelas) {
+        q += " WHERE kelas.id_kelas = ?";
+        params.push(id_kelas);
+      }
+
+      db.query(q, params, (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });

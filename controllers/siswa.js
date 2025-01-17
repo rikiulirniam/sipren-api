@@ -8,7 +8,8 @@ module.exports = {
    */
 
   async all(req, res) {
-    const data = await Siswa.all();
+    const { id_kelas } = req.query;
+    const data = await Siswa.all(id_kelas);
 
     return res.status(200).json({ data });
   },
