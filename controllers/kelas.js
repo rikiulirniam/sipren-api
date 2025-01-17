@@ -48,6 +48,10 @@ module.exports = {
     const { id_kelas } = req.params;
     const { id_jurusan, tingkat, no_kelas } = req.body;
 
+    if(!id_jurusan || !tingkat || no_kelas){
+      return res.status(400).json({ message: 'error!!' });
+    }
+
     await Kelas.update(id_jurusan, tingkat, no_kelas, id_kelas);
 
     return res.status(200).json({
@@ -57,7 +61,10 @@ module.exports = {
 
   async delete(req, res) {
     const { id_kelas } = req.params;
-    console.log(id_kelas);
+    if(!id_kelas){
+      return res.status(400).json({ message: 'error!!' });
+    }
+
     await Kelas.delete(id_kelas);
 
     return res.status(200).json({
@@ -67,18 +74,14 @@ module.exports = {
 
   async detail(req, res) {
     const { id_kelas } = req.query;
-    // console.log(tingkat, akronim, no_kelas);
+
+    if(!id_kelas){
+      return res.status(400).json({ message: 'error!!' });
+    }
 
     const data = await Kelas.find(id_kelas);
-    // const { id_jurusan, tingkat } = req.query;
-    // console.log(id_jurusan, tingkat);
     return res.status(200).json({
       data,
     });
-
-    // const data = await Kelas.all(id_jurusan, tingkat);
-    // return res.status(200).json({
-    //     data
-    // })
   },
 };

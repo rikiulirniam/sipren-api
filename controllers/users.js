@@ -23,7 +23,6 @@ module.exports = {
 
     if (!nama) {
       return res.status(400).json({ message: "Nama minimal 4 karakter." });
-
     }
 
     if (password.length < 6) {
