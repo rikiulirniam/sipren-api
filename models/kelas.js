@@ -33,14 +33,19 @@ class Kelas {
       let q =
         "INSERT INTO kelas(`id_jurusan`, `tingkat`, `no_kelas`) VALUES (?)";
 
-      db.query(q, [values], (err, data) => {
+      db.query(q, [values], (err, res) => {
         if (err) reject(err);
-        const selectQuery = "SELECT id_kelas FROM kelas WHERE id_kelas = ?";
-        db.query(selectQuery, [data.insertId], (err, data) => {
-          if (err) return reject(err);
+        // const selectQuery = "SELECT id_kelas FROM kelas WHERE id_kelas = ?";
+        // db.query(selectQuery, [data.insertId], (err, data) => {
+        //   if (err) return reject(err);
 
-          resolve(data); // Data pertama yang ditemukan
-        });
+        //   resolve(data); // Data pertama yang ditemukan
+        // });
+        if (res && res.insertId) {
+          resolve(res.insertId);
+        } else {
+          reject(new Error("tidak dapat mengembalikan id"));
+        }
       });
     });
   }
