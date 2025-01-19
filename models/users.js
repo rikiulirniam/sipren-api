@@ -7,7 +7,7 @@ class Users {
   static all() {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT user.id_user, user.username, user.level, user.create_date, user.update_date FROM user";
+        "SELECT user.id_user, user.username, user.nama ,user.level, user.create_date, user.update_date FROM user";
 
       db.query(q, (err, res) => {
         if (err) reject(err);
@@ -15,21 +15,36 @@ class Users {
       });
     });
   }
-  
-  static update(id_user, username, hashPassword, level){
-    return new Promise((resolve, reject) => {
-      let q = "UPDATE user SET username = ?, password = ?, level = ? WHERE id_user = ?";
 
-      db.query(q, [username, hashPassword, level, id_user], (err, res) => {
-        if(err) reject(err);
-        else resolve(res);
-      })
-    })
+  static update(id_user, username, nama, hashPassword, level) {
+    return new Promise((resolve, reject) => {
+      // let q =
+      //   "UPDATE user SET username = ? , nama = ?, password = ?, level = ? WHERE id_user = ?";
+      let q =
+        "UPDATE user SET username = ?, nama = ?, password = ?, level = ? WHERE id_user = ?";
+
+      db.query(
+        q,
+        [username, nama, hashPassword, level, id_user],
+        (err, res) => {
+          if (err) reject(err);
+          else resolve(res);
+        }
+      );
+      db.query(
+        q,
+        [username, nama, hashPassword, level, id_user],
+        (err, res) => {
+          if (err) reject(err);
+          else resolve(res);
+        }
+      );
+    });
   }
 
   static create(values) {
     return new Promise((resolve, reject) => {
-      let q = "INSERT INTO user(username, password, level) VALUES (?)";
+      let q = "INSERT INTO user(username, nama, password, level) VALUES (?)";
 
       db.query(q, [values], (err, data) => {
         if (err) reject(err);
@@ -38,17 +53,17 @@ class Users {
     });
   }
 
-  static delete(id_user){
+  static delete(id_user) {
     return new Promise((resolve, reject) => {
       let q = "DELETE FROM user where id_user = ?";
 
       db.query(q, [id_user], (err, data) => {
         if (err) reject(err);
         else resolve(data);
-      })
-    })
+      });
+    });
   }
-  
+
   static find(username) {
     return new Promise((resolve, reject) => {
       let q = "SELECT * FROM user WHERE username = ? ";
@@ -92,7 +107,6 @@ class Users {
       });
     });
   }
-
 }
 
 module.exports = Users;

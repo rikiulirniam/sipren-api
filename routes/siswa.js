@@ -1,7 +1,10 @@
-const router = require('express').Router();
-const controllers = require('../controllers/siswa')
+const router = require("express").Router();
+const controllers = require("../controllers/siswa");
 
-router.get('/', controllers.all);
-router.get('/:id_kelas', controllers.index);
+router.delete("/:nis", controllers.delete);
+router.put("/:nis", controllers.update);
+router.get("/", controllers.all);
+router.get("/:nis", controllers.index);
+router.post("/", controllers.create);
 
 module.exports = router;

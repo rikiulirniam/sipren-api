@@ -7,9 +7,9 @@ module.exports = {
    * @param {Response} res
    */
   async index(req, res) {
-    const { id_jurusan, tingkat } = req.query;
+    const { id_jurusan, tingkat, no_kelas } = req.query;
 
-    const data = await Kelas.all(id_jurusan, tingkat);
+    const data = await Kelas.all(id_jurusan, tingkat, no_kelas);
 
     return res.json({ data });
   },
@@ -36,20 +36,22 @@ module.exports = {
       return res.status(400).json({ message: "no_kelas melewati batas" });
     }
 
-    if (!["x", "XI", "XII"].includes[tingkat]) {
-      return res.status(400).json({ message: "tingkat tidak sesuai" });
-    }
-
     const data = await Kelas.create([id_jurusan, tingkat, no_kelas]);
 
     return res.status(200).json({
       message: "berhasil insert kelas",
+      kelas_id: data,
+      test: "test",
     });
   },
 
   async update(req, res) {
     const { id_kelas } = req.params;
     const { id_jurusan, tingkat, no_kelas } = req.body;
+
+    if (!id_jurusan || !tingkat || no_kelas) {
+      return res.status(400).json({ message: "error!!" });
+    }
 
     await Kelas.update(id_jurusan, tingkat, no_kelas, id_kelas);
 
@@ -60,7 +62,10 @@ module.exports = {
 
   async delete(req, res) {
     const { id_kelas } = req.params;
-    console.log(id_kelas);
+    if (!id_kelas) {
+      return res.status(400).json({ message: "error!!" });
+    }
+
     await Kelas.delete(id_kelas);
 
     return res.status(200).json({
@@ -69,19 +74,15 @@ module.exports = {
   },
 
   async detail(req, res) {
-    const { tingkat, id_jurusan, no_kelas } = req.query;
-    console.log(tingkat, id_jurusan, no_kelas);
+    const { id_kelas } = req.query;
 
-    const data = await Kelas.find(tingkat, id_jurusan, no_kelas);
-    // const { id_jurusan, tingkat } = req.query;
-    // console.log(id_jurusan, tingkat);
+    if (!id_kelas) {
+      return res.status(400).json({ message: "error!!" });
+    }
+
+    const data = await Kelas.find(id_kelas);
     return res.status(200).json({
       data,
     });
-
-    // const data = await Kelas.all(id_jurusan, tingkat);
-    // return res.status(200).json({
-    //     data
-    // })
   },
 };
