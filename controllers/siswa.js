@@ -32,13 +32,13 @@ module.exports = {
 
   async create(req, res) {
     const { nis, rfid, nama, id_kelas } = req.body;
-
+    
     try {
       const data = await Siswa.create([nis, rfid, nama, id_kelas]);
       return res.status(200).json({ message: "berhasil create siswa" });
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ message: "error" });
+      return res.status(400).json({ message: "sudah ada siswa dengan data tersebut" });
     }
   },
 
