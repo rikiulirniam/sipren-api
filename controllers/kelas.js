@@ -40,7 +40,8 @@ module.exports = {
 
     return res.status(200).json({
       message: "berhasil insert kelas",
-      data: data.id_kelas,
+      kelas_id: data,
+      test: "test",
     });
   },
 
@@ -48,8 +49,8 @@ module.exports = {
     const { id_kelas } = req.params;
     const { id_jurusan, tingkat, no_kelas } = req.body;
 
-    if(!id_jurusan || !tingkat || no_kelas){
-      return res.status(400).json({ message: 'error!!' });
+    if (!id_jurusan || !tingkat || no_kelas) {
+      return res.status(400).json({ message: "error!!" });
     }
 
     await Kelas.update(id_jurusan, tingkat, no_kelas, id_kelas);
@@ -61,8 +62,8 @@ module.exports = {
 
   async delete(req, res) {
     const { id_kelas } = req.params;
-    if(!id_kelas){
-      return res.status(400).json({ message: 'error!!' });
+    if (!id_kelas) {
+      return res.status(400).json({ message: "error!!" });
     }
 
     await Kelas.delete(id_kelas);
@@ -75,8 +76,8 @@ module.exports = {
   async detail(req, res) {
     const { id_kelas } = req.query;
 
-    if(!id_kelas){
-      return res.status(400).json({ message: 'error!!' });
+    if (!id_kelas) {
+      return res.status(400).json({ message: "error!!" });
     }
 
     const data = await Kelas.find(id_kelas);
