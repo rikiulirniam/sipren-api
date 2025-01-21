@@ -54,7 +54,7 @@ class Siswa {
   static delete(nis) {
     return new Promise((resolve, reject) => {
       let q = "DELETE FROM siswa WHERE nis = ?";
-      db.query(q, [nis], (err, ers) => {
+      db.query(q, [nis], (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });

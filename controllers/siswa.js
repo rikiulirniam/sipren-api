@@ -64,6 +64,7 @@ module.exports = {
 
   async delete(req, res) {
     const { nis } = req.params;
+    
     try {
       const data = await Siswa.delete(nis);
       return res.status(200).json({ message: "berhasil delete siswa" });
