@@ -8,8 +8,8 @@ module.exports = {
    */
 
   async all(req, res) {
-    const data = await Siswa.all();
-
+    const fetch = await Siswa.all();
+    const data = fetch.rows;
     return res.status(200).json({ data });
   },
 
@@ -17,15 +17,15 @@ module.exports = {
     const { nis } = req.params;
 
     try {
-      const data = await Siswa.find(nis);
-
-      if (data.length === 0) {
+      const fetch = await Siswa.find(nis);
+      const data = fetch.rows[0];
+      if (fetch.rows.length === 0) {
         return res.status(404).json({ message: "tidak menemukan data" });
       }
-
+      
       return res.status(200).json({ data });
     } catch (err) {
-      return res.status(400).json({ message: "error" });
+      return res.status(500).json({ message: "error" });
     }
   },
 
@@ -42,12 +42,16 @@ module.exports = {
   },
 
   async update(req, res) {
-    const { nis } = req.params;
+    const { old_nis } = req.params;
 
-    const { rfid, nama } = req.body;
+    const { rfid, nama, nis } = req.body;
 
     try {
-      const data = await Siswa.update(rfid, nama, nis);
+      const isDataExist = await Siswa.find(old_nis)
+      if(isDataExist.rows.length === 0){
+        return res.status(200).json({message : "Data tidak ditemukan"})
+      }
+      const data = await Siswa.update(old_nis, rfid, nama, nis);
       return res.status(200).json({
         message: "Berhasil update data",
       });
@@ -60,9 +64,13 @@ module.exports = {
   async delete(req, res) {
     const { nis } = req.params;
     try {
+      const isDataExist = await Siswa.find(nis)
+      if(isDataExist.rows.length === 0){
+        return res.status(200).json({message : "Data tidak ditemukan"})
+      }
       const data = await Siswa.delete(nis);
       return res.status(200).json({ message: "berhasil delete siswa" });
-    } catch (err) {
+    } catch (err) { 
       console.log(err);
       return res.status(500).json({ message: "error delete" });
     }

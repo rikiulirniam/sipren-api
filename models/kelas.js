@@ -28,19 +28,14 @@ class Kelas {
     });
   }
 
-  static create(values) {
+  static create(id_jurusan, tingkat, no_kelas) {
     return new Promise((resolve, reject) => {
       let q =
-        "INSERT INTO kelas(`id_jurusan`, `tingkat`, `no_kelas`) VALUES (?)";
+        `INSERT INTO kelas(id_jurusan, tingkat, no_kelas) VALUES ($1, $2, $3) RETURNING *`;
 
-      db.query(q, [values], (err, data) => {
+      db.query(q, [id_jurusan, tingkat, no_kelas], (err, data) => {
         if (err) reject(err);
-        const selectQuery = "SELECT id_kelas FROM kelas WHERE id_kelas = ?";
-        db.query(selectQuery, [data.insertId], (err, data) => {
-          if (err) return reject(err);
-
-          resolve(data); // Data pertama yang ditemukan
-        });
+        resolve(data.rows[0]); 
       });
     });
   }
@@ -48,7 +43,7 @@ class Kelas {
   static update(id_jurusan, tingkat, no_kelas, id_kelas) {
     return new Promise((resolve, reject) => {
       let q =
-        "UPDATE kelas SET id_jurusan = ?, tingkat=?, no_kelas = ? WHERE id_kelas = ? ";
+        "UPDATE kelas SET id_jurusan = $1, tingkat=$2, no_kelas = $3 WHERE id_kelas = $4 ";
 
       db.query(q, [id_jurusan, tingkat, no_kelas, id_kelas], (err, data) => {
         if (err) reject(err);
@@ -60,7 +55,7 @@ class Kelas {
 
   static delete(id_kelas) {
     return new Promise((resolve, reject) => {
-      let q = "DELETE FROM kelas WHERE id_kelas = ? ";
+      let q = "DELETE FROM kelas WHERE id_kelas = $1 ";
 
       db.query(q, [id_kelas], (err, data) => {
         if (err) reject(err);
@@ -73,10 +68,8 @@ class Kelas {
   static find(id_kelas) {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT k.id_kelas, j.id_jurusan, j.nama_jurusan, j.akronim, k.tingkat, k.no_kelas FROM kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.id_kelas = ?;";
-      // let q = "SELECT * FROM kelas where tingkat = '?'";
+        "SELECT k.id_kelas, j.id_jurusan, j.nama_jurusan, j.akronim, k.tingkat, k.no_kelas FROM kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.id_kelas = $1";
 
-      // Konversikan no_kelas menjadi angka (integer) jika perlu
       db.query(q, [id_kelas], (err, data) => {
         if (err) return reject(err);
         resolve(data);
@@ -87,11 +80,11 @@ class Kelas {
   static getIdKelas(tingkat, id_jurusan, no_kelas) {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT k.id_kelas from kelas k INNER JOIN jurusan j ON k.id_jurusan = j.id_jurusan WHERE k.tingkat = ? AND k.id_jurusan = ? AND k.no_kelas = ?";
+        "SELECT id_kelas FROM kelas WHERE tingkat = $1 AND id_jurusan = $2 AND no_kelas = $3";
 
       db.query(q, [tingkat, id_jurusan, no_kelas], (err, data) => {
         if (err) return reject(err);
-        resolve(data[0].id_kelas);
+        resolve(data.rows);
       });
     });
   }

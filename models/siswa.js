@@ -4,7 +4,7 @@ class Siswa {
   static all() {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT siswa.nis, siswa.rfid, siswa.nama, jurusan.akronim, kelas.tingkat, kelas.no_kelas, siswa.create_date, siswa.update_date FROM siswa INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
+        "SELECT siswa.nis, siswa.rfid, siswa.nama, jurusan.akronim, kelas.tingkat, kelas.no_kelas FROM siswa INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
 
       db.query(q, (err, res) => {
         if (err) reject(err);
@@ -15,20 +15,20 @@ class Siswa {
 
   static create(values) {
     return new Promise((resolve, reject) => {
-      let q = "INSERT INTO siswa(nis, rfid, nama, id_kelas) VALUES (?)";
+      let q = "INSERT INTO siswa(nis, rfid, nama, id_kelas) VALUES ($1, $2, $3, $4)";
 
-      db.query(q, [values], (err, res) => {
+      db.query(q, values, (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
     });
   }
 
-  static update(rfid, nama, nis) {
+  static update(old_nis, rfid, nama, new_nis) {
     return new Promise((resolve, reject) => {
-      let q = "UPDATE siswa SET rfid = ?, nama = ? WHERE nis = ?";
+      let q = "UPDATE siswa SET rfid = $1, nama = $2, nis = $3 WHERE nis = $4";
 
-      db.query(q, [rfid, nama, nis], (err, res) => {
+      db.query(q, [rfid, nama, new_nis, old_nis], (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
@@ -37,8 +37,8 @@ class Siswa {
 
   static delete(nis) {
     return new Promise((resolve, reject) => {
-      let q = "DELETE FROM siswa WHERE nis = ?";
-      db.query(q, [nis], (err, ers) => {
+      let q = `DELETE FROM "siswa" WHERE "nis" = $1`;
+      db.query(q, [nis], (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
@@ -52,15 +52,14 @@ class Siswa {
           siswa.nis, 
           siswa.rfid, 
           siswa.nama, 
+          siswa.id_kelas,
           jurusan.akronim, 
           kelas.tingkat, 
-          kelas.no_kelas, 
-          siswa.create_date, 
-          siswa.update_date 
+          kelas.no_kelas
         FROM siswa 
         INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas 
         INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan 
-        WHERE siswa.nis = ?
+        WHERE siswa.nis = $1
       `;
 
       db.query(query, [nis], (err, results) => {
@@ -79,16 +78,9 @@ class Siswa {
         SELECT 
           siswa.nis, 
           siswa.rfid, 
-          siswa.nama, 
-          jurusan.akronim, 
-          kelas.tingkat, 
-          kelas.no_kelas, 
-          siswa.create_date, 
-          siswa.update_date 
+          siswa.nama
         FROM siswa 
-        INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas 
-        INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan 
-        WHERE siswa.id_kelas = ?
+        WHERE siswa.id_kelas = $1
       `;
 
       db.query(query, [id_kelas], (err, results) => {

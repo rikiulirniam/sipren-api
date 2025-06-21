@@ -18,16 +18,15 @@ module.exports = {
             }
     
             const userData = await Users.find(username);
-    
-            if(userData.length === 0){
+            
+            const user = userData.rows[0];
+            
+            if(userData.rows.length === 0){
                 return res.status(401).json({message: 'User tidak ditemukan '});
             }
+            const isMatch = await bcrypt.compare(password, user?.password);
     
-            const user = userData[0];
-    
-            const isMatch = await bcrypt.compare(password, user.password);
-    
-            if(!isMatch) {
+            if(!isMatch) {  
                 return res.status(401).json({ message: 'password salah.' });
             }  
     
@@ -45,6 +44,7 @@ module.exports = {
             });
             
             if(user.level === 0){
+                // console.log(accessToken)
                 res.status(200).json({
                     message: "Login berhasil sebagai guru",
                     accessToken,
@@ -133,7 +133,8 @@ module.exports = {
     async logout(req, res){
         const refreshToken = req.cookies.refreshToken;
         if(!refreshToken) return res.sendStatus(204);
-        const user = await Users.findRefreshToken(refreshToken);
+        const userData = await Users.findRefreshToken(refreshToken);
+        const user = userData.rows;
         if(!user[0]) return res.sendStatus(204);
         const userId = user[0].id_user;
         await Users.refreshToken(null, userId);

@@ -7,6 +7,7 @@ const Verify = require("./middleware/verifyUser");
 dotenv.config();
 
 const app = express();
+const host = process.env.HOST || "http://localhost"
 const port = process.env.PORT || 8000;
 
 app.use(
@@ -24,15 +25,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/", require("./routes/main"));
-app.use("/jurusan", require("./routes/jurusan"));
-app.use("/kelas", require("./routes/kelas"));
-app.use("/mapel", require("./routes/mapel"));
-app.use("/materi", require("./routes/materi"));
+app.use("/jurusan",Verify.verifyToken, require("./routes/jurusan"));
+app.use("/kelas",Verify.verifyToken, require("./routes/kelas"));
+app.use("/mapel",Verify.verifyToken, require("./routes/mapel"));
+app.use("/materi",Verify.verifyToken, require("./routes/materi"));
 app.use("/presensi", Verify.verifyToken, require("./routes/presensi"));
-app.use("/det_presensi", require("./routes/detailPresensi"));
-app.use("/guru", require("./routes/guru"));
-app.use("/siswa", require("./routes/siswa"));
-app.use("/tingkat", require("./routes/tingkat"));
+app.use("/det_presensi",Verify.verifyToken, require("./routes/detailPresensi"));
+app.use("/guru",Verify.verifyToken, require("./routes/guru"));
+app.use("/siswa",Verify.verifyToken, require("./routes/siswa"));
+app.use("/tingkat",Verify.verifyToken, require("./routes/tingkat"));
 app.use(
   "/users",
   Verify.verifyToken,
@@ -44,6 +45,6 @@ app.use("/auth", require("./routes/auth"));
 // Jalankan server
 app.listen(port, () => {
   console.log(
-    "[server] server berhasil dijalankan di http://127.0.0.1/:" + port
+    `[server] server berhasil dijalankan di ${host}:${port}` 
   );
 });

@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const controllers = require("../controllers/siswa");
 
-router.delete("/:nis", controllers.delete);
-router.put("/:nis", controllers.update);
-router.get("/", controllers.all);
+router.get("/", controllers.all); 
 router.get("/:nis", controllers.index);
+router.put("/:old_nis", controllers.update);
+router.delete("/:nis", controllers.delete);
 router.post("/", controllers.create);
 
 module.exports = router;
