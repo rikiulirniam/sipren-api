@@ -4,8 +4,8 @@ const token = require("../controllers/auth");
 const verify = require("../middleware/verifyUser");
 
 router.get("/", controllers.all);
+router.post("/", controllers.create);
 router.get("/token", token.refreshToken);
-router.post("/create", controllers.create);
 router.put("/:id_user", controllers.update);
 router.get("/:id_user", controllers.show);
 router.delete("/:id_user", controllers.delete);

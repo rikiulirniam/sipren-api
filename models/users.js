@@ -7,7 +7,7 @@ class Users {
   static all() {
     return new Promise((resolve, reject) => {
       let q =
-        "SELECT user.id_user, user.username, user.nama ,user.level, user.create_date, user.update_date FROM user";
+        `SELECT "user".id_user, "user".username, "user".nama ,"user".level FROM "user"`;
 
       db.query(q, (err, res) => {
         if (err) reject(err);
@@ -18,20 +18,9 @@ class Users {
 
   static update(id_user, username, nama, hashPassword, level) {
     return new Promise((resolve, reject) => {
-      // let q =
-      //   "UPDATE user SET username = ? , nama = ?, password = ?, level = ? WHERE id_user = ?";
-      let q =
-        "UPDATE user SET username = ?, nama = ?, password = ?, level = ? WHERE id_user = ?";
+      let q =`UPDATE "user" SET username = $1, nama = $2, password = $3, level = $4 WHERE id_user = $5`;
 
-      db.query(
-        q,
-        [username, nama, hashPassword, level, id_user],
-        (err, res) => {
-          if (err) reject(err);
-          else resolve(res);
-        }
-      );
-      db.query(
+        db.query(
         q,
         [username, nama, hashPassword, level, id_user],
         (err, res) => {
@@ -42,11 +31,11 @@ class Users {
     });
   }
 
-  static create(values) {
+  static create(username, nama, hashPassword, level) {
     return new Promise((resolve, reject) => {
-      let q = "INSERT INTO user(username, nama, password, level) VALUES (?)";
+      let q = `INSERT INTO "user" (username, nama, password, level) VALUES ($1, $2, $3, $4)`;
 
-      db.query(q, [values], (err, data) => {
+      db.query(q, [username, nama, hashPassword, level], (err, data) => {
         if (err) reject(err);
         else resolve(data);
       });
@@ -55,7 +44,7 @@ class Users {
 
   static delete(id_user) {
     return new Promise((resolve, reject) => {
-      let q = "DELETE FROM user where id_user = ?";
+      let q = `DELETE FROM "user" where id_user = $1`;
 
       db.query(q, [id_user], (err, data) => {
         if (err) reject(err);
@@ -66,7 +55,7 @@ class Users {
 
   static find(username) {
     return new Promise((resolve, reject) => {
-      let q = "SELECT * FROM user WHERE username = ? ";
+      let q = `SELECT * FROM "user" WHERE "username" = $1 `;
 
       db.query(q, [username], (err, data) => {
         if (err) reject(err);
@@ -77,18 +66,18 @@ class Users {
 
   static findById(id_user) {
     return new Promise((resolve, reject) => {
-      let q = "SELECT * FROM user WHERE id_user = ? ";
+      let q = `SELECT * FROM "user" WHERE id_user = $1 `;
 
       db.query(q, [id_user], (err, data) => {
         if (err) reject(err);
-        else resolve(data[0]);
+        else resolve(data);
       });
     });
   }
 
   static findRefreshToken(refreshToken) {
     return new Promise((resolve, reject) => {
-      let q = "SELECT * FROM user WHERE refresh_token = ?";
+      let q = `SELECT * FROM "user" WHERE "refresh_token" = $1`;
 
       db.query(q, [refreshToken], (err, data) => {
         if (err) reject(err);
@@ -99,7 +88,7 @@ class Users {
 
   static refreshToken(newRefreshToken, id) {
     return new Promise((resolve, reject) => {
-      let q = "UPDATE user SET refresh_token = ? WHERE id_user = ?";
+      let q = `UPDATE "user" SET "refresh_token" = $1 WHERE id_user = $2`;
 
       db.query(q, [newRefreshToken, id], (err, data) => {
         if (err) reject(err);

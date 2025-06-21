@@ -18,11 +18,6 @@ class Materi {
     
             db.query(q, [value], (err, data) => {
                 if (err) return reject(err);
-    
-                // Log hasil dari query untuk debugging
-                // console.log("Hasil dari query INSERT:", data);
-    
-                // Memastikan data tidak undefined
                 if (data && data.insertId) {
                     resolve(data.insertId);
                 } else {
