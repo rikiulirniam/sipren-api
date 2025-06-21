@@ -44,6 +44,6 @@ app.use("/auth", require("./routes/auth"));
 // Jalankan server
 app.listen(port, () => {
   console.log(
-    "[server] server berhasil dijalankan di http://127.0.0.1/:" + port
+    "[server] server berhasil dijalankan di http://127.0.0.1:" + port
   );
 });
