@@ -1,12 +1,12 @@
 const db = require("../utils/db");
 
 class Siswa {
-  static all() {
+  static all(id_kelas) {
     return new Promise((resolve, reject) => {
       let q =
         "SELECT siswa.nis, siswa.rfid, siswa.nama, jurusan.akronim, kelas.tingkat, kelas.no_kelas FROM siswa INNER JOIN kelas ON siswa.id_kelas = kelas.id_kelas INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan";
 
-      db.query(q, (err, res) => {
+      db.query(q, params, (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
@@ -38,6 +38,7 @@ class Siswa {
   static delete(nis) {
     return new Promise((resolve, reject) => {
       let q = `DELETE FROM "siswa" WHERE "nis" = $1`;
+
       db.query(q, [nis], (err, res) => {
         if (err) reject(err);
         else resolve(res);
@@ -72,6 +73,7 @@ class Siswa {
       });
     });
   }
+
   static findByKelas(id_kelas) {
     return new Promise((resolve, reject) => {
       const query = `
@@ -93,6 +95,33 @@ class Siswa {
       });
     });
   }
+
+  static upload(values) {
+  return new Promise((resolve, reject) => {
+    const q = "INSERT INTO siswa (nis, rfid, nama, id_kelas) VALUES ?";
+    db.query(q, [values], (err, result) => {
+      if (err) {
+        console.error("Terjadi error:", err);
+        return reject(err);
+      }
+      resolve(result);
+    });
+  });
+}
+
+static upload(values) {
+  return new Promise((resolve, reject) => {
+    const q = "INSERT INTO siswa (nis, rfid, nama, id_kelas) VALUES ?";
+    db.query(q, [values], (err, result) => {
+      if (err) {
+        console.error("Terjadi error:", err);
+        return reject(err);
+      }
+      resolve(result);
+    });
+  });
+}
+
 }
 
 module.exports = Siswa;

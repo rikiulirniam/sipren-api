@@ -36,6 +36,7 @@ class Kelas {
       db.query(q, [id_jurusan, tingkat, no_kelas], (err, data) => {
         if (err) reject(err);
         resolve(data.rows[0]); 
+
       });
     });
   }

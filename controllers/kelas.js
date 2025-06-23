@@ -72,6 +72,7 @@ module.exports = {
       return res
         .status(422)
         .json({ message: "id_jurusan atau no_kelas harus berupa angka" });
+
     }
 
     if (no_kelas > 5 || no_kelas < 1) {
@@ -95,6 +96,7 @@ module.exports = {
     const { id_kelas } = req.params;
     if(!id_kelas){
       return res.status(422).json({ message: 'error!!' });
+
     }
 
     const existData = await Kelas.find(id_kelas);
@@ -115,6 +117,7 @@ module.exports = {
 
     if(!id_kelas){
       return res.status(422).json({ message: 'id_kelas tidak valid' });
+
     }
 
     const data = await Kelas.find(id_kelas);
