@@ -45,6 +45,18 @@ class Siswa {
     });
   }
 
+  static deleteByKelas(id_kelas) {
+    return new Promise((resolve, reject) => {
+      let q = `DELETE FROM "siswa" WHERE id_kelas = $1`;
+      db.query(q, [id_kelas], (err, res) => {
+        if (err) reject(err);
+        else resolve(res);
+      });
+    });
+  }
+
+  
+
   static find(nis) {
     return new Promise((resolve, reject) => {
       const query = `
@@ -72,6 +84,19 @@ class Siswa {
       });
     });
   }
+
+  static findByRfid(rfid){
+    return new Promise((resolve, reject) => {
+      const q =  `SELECT * FROM siswa WHERE siswa.rfid = $1`
+
+      db.query(q, [rfid], (err, res)=>{
+        if(err) reject(err);
+        else resolve(res);
+      })
+    })
+  }
+
+
   static findByKelas(id_kelas) {
     return new Promise((resolve, reject) => {
       const query = `

@@ -47,23 +47,24 @@ module.exports = {
 
   async update(req, res) {
     const { id_user } = req.params;
-
     const { username, nama, password, level } = req.body;
-    
+
     try {
       const user = await Users.findById(id_user);
       if (user.rows.length === 0) {
         return res.status(404).json({ message: "User tidak ditemukan" });
       }
 
-      let hashPassword = user.password; // Gunakan password lama jika tidak ada password baru
+      const currentUser = user.rows[0]; 
 
-      if (password) {
+      let hashPassword;
+      if (!password) {
+        hashPassword = currentUser.password;
+      } else {
         const salt = await bcrypt.genSalt();
         hashPassword = await bcrypt.hash(password, salt);
       }
 
-      // Pastikan parameter sesuai dengan urutan yang diharapkan di model Users.update
       await Users.update(id_user, username, nama, hashPassword, level);
 
       return res.status(200).json({ message: "Berhasil update user" });
@@ -72,6 +73,7 @@ module.exports = {
       return res.status(500).json({ message: "Terjadi error pada server" });
     }
   },
+
   async delete(req, res) {
     const { id_user } = req.params;
 

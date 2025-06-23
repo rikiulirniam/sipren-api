@@ -16,24 +16,43 @@ class Mapel {
         })
     }
 
-    static all(){
-        return new Promise((resolve, reject) => {
-            let q = "SELECT m.id_mapel, t.tingkat, m.nama_mapel, produktif FROM mapel m INNER JOIN tingkat t";
+    static all() {
+    return new Promise((resolve, reject) => {
+        const q = `
+        SELECT 
+            id_mapel, 
+            tingkat, 
+            nama_mapel, 
+            produktif 
+        FROM mapel 
+        `;
 
-            db.query(q, (err, data) => {
-                if(err) reject(err);
-                resolve(data);
-            })
-        })
+        db.query(q, (err, result) => {
+        if (err) return reject(err);
+        resolve(result.rows);
+        });
+    });
     }
+
 
     static getIdMapel(nama_mapel){
         return new Promise((resolve, reject) => {
-            let q = "SELECT id_mapel FROM mapel WHERE nama_mapel = ?";
+            let q = "SELECT id_mapel FROM mapel WHERE nama_mapel = $1";
 
             db.query(q, [nama_mapel], (err, data) => {
                 if(err) reject(err);
                 resolve(data[0].id_mapel);
+            })
+        })
+    }
+
+
+    static create(nama_mapel, produktif){
+        return new Promise((resolve, reject) => {
+            let q = `INSERT INTO mapel (nama_mapel, produktif) VALUES ($1, $2)`;
+            db.query(q, [nama_mapel, produktif], (err, res) => {
+                if(err) reject(err);
+                else resolve(res);
             })
         })
     }
