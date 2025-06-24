@@ -1,30 +1,30 @@
 const db = require('../utils/db');
 
 class Materi {
-    static show(id_materi) {
-        return new Promise((resolve, reject) => {
-            let q = "SELECT id_materi, nama_materi, deskripsi FROM materi WHERE id_materi = ?";
 
-            db.query(q, [id_materi], (err, data) => {
-                if (err) reject(err);
-                resolve(data);
-            })
-        })
-    }
 
-    static create(value) {
+    static create( nama_materi, deskripsi) {
         return new Promise((resolve, reject) => {
-            let q = "INSERT INTO materi (`id_mapel`, `nama_materi`, `deskripsi`) VALUES (?)";
+            let q = "INSERT INTO materi (nama_materi, deskripsi) VALUES ($1, $2) RETURNING *";
     
-            db.query(q, [value], (err, data) => {
-                if (err) return reject(err);
-                if (data && data.insertId) {
-                    resolve(data.insertId);
-                } else {
-                    reject(new Error("insertId tidak ditemukan dalam hasil query"));
+            db.query(q, [nama_materi, deskripsi], (err, data) => {
+                if (err) reject(err);
+                if (data) {
+                    resolve(data.rows[0].id_materi);
                 }
             });
         });
+    }
+
+    static update(materi, deskripsi_materi, id_materi){
+        return new Promise((resolve, reject) => {
+            let q = `UPDATE materi SET nama_materi = $1, deskripsi = $2 WHERE id_materi = $3`
+
+            db.query(q, [materi, deskripsi_materi, id_materi], (err, res) => {
+                if(err) reject(err)
+                resolve(res)
+            })
+        })
     }
 }
 

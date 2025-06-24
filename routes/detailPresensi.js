@@ -1,9 +1,8 @@
 const router = require("express").Router();
 const controller = require("../controllers/detailPresensi");
 
-router.get("/", controller.all);
 router.get("/:id_presensi", controller.show);
-router.post("/", controller.create);
-router.put("/", controller.updateKeterangan);
+router.put("/:id_detail_presensi", controller.editKeterangan);
+router.put("/:id_presensi/present", controller.present);
 
 module.exports = router;

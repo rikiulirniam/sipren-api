@@ -30,8 +30,7 @@ app.use("/kelas",Verify.verifyToken, require("./routes/kelas"));
 app.use("/mapel",Verify.verifyToken, require("./routes/mapel"));
 app.use("/materi",Verify.verifyToken, require("./routes/materi"));
 app.use("/presensi", Verify.verifyToken, require("./routes/presensi"));
-app.use("/det_presensi",Verify.verifyToken, require("./routes/detailPresensi"));
-app.use("/guru",Verify.verifyToken, require("./routes/guru"));
+app.use("/detail_presensi",Verify.verifyToken, require("./routes/detailPresensi"));
 app.use("/siswa",Verify.verifyToken, require("./routes/siswa"));
 app.use("/tingkat",Verify.verifyToken, require("./routes/tingkat"));
 app.use(
