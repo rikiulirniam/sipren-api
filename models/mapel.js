@@ -21,7 +21,6 @@ class Mapel {
         const q = `
         SELECT 
             id_mapel, 
-            tingkat, 
             nama_mapel, 
             produktif 
         FROM mapel 
