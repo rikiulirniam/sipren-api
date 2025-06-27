@@ -79,6 +79,7 @@ class Kelas {
       });
     });
   }
+  
   static getIdKelas(tingkat, id_jurusan, no_kelas) {
     return new Promise((resolve, reject) => {
       let q =

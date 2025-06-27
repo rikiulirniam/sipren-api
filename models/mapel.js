@@ -20,8 +20,7 @@ class Mapel {
     return new Promise((resolve, reject) => {
         const q = `
         SELECT 
-            id_mapel, 
-            tingkat, 
+            id_mapel,
             nama_mapel, 
             produktif 
         FROM mapel 

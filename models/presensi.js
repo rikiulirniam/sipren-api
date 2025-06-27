@@ -12,6 +12,7 @@ class Presensi {
          kelas.no_kelas,
           jurusan.akronim,
           kelas.tingkat,
+          presensi.id_presensi,
           presensi.jam_started,
           presensi.jam_ended ,
           presensi.created_at
