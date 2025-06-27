@@ -122,10 +122,11 @@ module.exports = {
   },
 
   async index(req, res) {
+    const refreshToken = req.cookies.refreshToken;
+     if (!refreshToken) return res.status(401).json("anda tidak terdeteksi, coba login ulang");
     try {
-      const { id_kelas } = req.params;
 
-      const data = await Presensi.findByKelas(id_kelas);
+      const data = await Presensi.findByUser(req.user.id);
       return res.status(200).json({ data: data.rows });
     } catch (error) {
       return res.status(500).json({ message: "Terjadi kesalahan" });
@@ -136,7 +137,6 @@ module.exports = {
     const { id_presensi } = req.params;
     try {
       const dataPresensi = await Presensi.findByPresensi(id_presensi);
-      console.log(dataPresensi)
       const dataDetailPresensi = await DetailPresensi.find(id_presensi);
 
       dataPresensi.rows[0].detail_presensi = dataDetailPresensi;
