@@ -4,7 +4,9 @@ class Presensi {
   static all() {
     return new Promise((resolve, reject) => {
       let q =
-        `SELECT materi.nama_materi,
+        `SELECT 
+        presensi.id_presensi,
+        materi.nama_materi,
          materi.deskripsi,
         "user".nama,
         "user".username,
@@ -77,7 +79,7 @@ class Presensi {
     });
   }
 
-    static findByKelas(id_kelas) {
+    static findByUser(id_user) {
       return new Promise((resolve, reject) => {
         let q =
           `SELECT 
@@ -96,9 +98,9 @@ class Presensi {
           INNER JOIN kelas ON presensi.id_kelas = kelas.id_kelas 
           INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan
           INNER JOIN mapel ON presensi.id_mapel = mapel.id_mapel 
-          WHERE kelas.id_kelas = $1`;
+          WHERE "user".id_user = $1`;
 
-        db.query(q, [id_kelas], (err, res) => {
+        db.query(q, [id_user], (err, res) => {
           if (err) reject(err);
           else resolve(res);
         });
