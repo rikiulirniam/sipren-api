@@ -111,6 +111,7 @@ class Presensi {
         `SELECT 
         mapel.nama_mapel AS mapel,
         materi.nama_materi,
+        materi.deskripsi,
         materi.id_materi,
         "user".nama AS nama_guru,
         kelas.id_kelas,

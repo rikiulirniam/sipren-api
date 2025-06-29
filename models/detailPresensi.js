@@ -18,7 +18,8 @@ class DetailPresensi {
     return new Promise((resolve, reject) => {
       let q = `SELECT 
       "user".nama, 
-      siswa.nama, 
+      siswa.nama,
+      det_presensi.id_det, 
       det_presensi.keterangan,
       det_presensi.present_at 
       FROM det_presensi 
@@ -82,17 +83,19 @@ class DetailPresensi {
       });
     });
   }
-  static present(rfid, id_presensi) {
+
+  static present(rfid, id_presensi, currentDateTime) {
     return new Promise((resolve, reject) => {
       let q =
         `UPDATE det_presensi
-          SET keterangan = 'H'
+          SET keterangan = 'H',
+          present_at = $1
           FROM siswa s
-          WHERE det_presensi.id_siswa = s.nis AND s.rfid = $1 AND det_presensi.id_presensi = $2
+          WHERE det_presensi.id_siswa = s.nis AND s.rfid = $2 AND det_presensi.id_presensi = $3
           RETURNING *
           `;
 
-      db.query(q, [rfid, id_presensi], (err, res) => {
+      db.query(q, [currentDateTime, rfid, id_presensi], (err, res) => {
         if (err) reject(err);
         else resolve(res.rows[0].nama);
       });

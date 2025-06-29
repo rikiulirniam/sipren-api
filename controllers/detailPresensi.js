@@ -1,6 +1,8 @@
 const DetailPresensi = require("../models/detailPresensi");
 const Presensi = require("../models/presensi");
 const Siswa = require("../models/siswa");
+const dayjs = require("dayjs");
+
 
 module.exports = {
   async all(req, res) {
@@ -36,12 +38,14 @@ module.exports = {
     await DetailPresensi.updateKeterangan(keterangan, id_detail_presensi);
     
     return res.status(200).json({message : "keterangan berhasil diubah!"})
-  }
-  ,
+  },
+
   async present(req, res){
     const {id_presensi} = req.params;
     const {rfid} = req.body;
+    const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
     
+
     const presensi = await Presensi.findByPresensi(id_presensi);
     if (presensi.rows.length === 0) {
       return res.status(404).json({
@@ -70,7 +74,7 @@ module.exports = {
       })
     }
 
-    const data = await DetailPresensi.present(rfid, id_presensi);
+    const data = await DetailPresensi.present(rfid, id_presensi, currentDateTime);
 
     return res.status(200).json({
       message: `${data} hadir!`
