@@ -102,7 +102,6 @@ module.exports = {
       return res.status(404).json({message : 'kelas tidak ditemukan'});
     }
 
-    // await Siswa.deleteByKelas(id_kelas)
     await Kelas.delete(id_kelas);
 
     return res.status(200).json({
