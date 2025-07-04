@@ -44,6 +44,47 @@ module.exports = {
     }
   },
 
+  async createMany(req, res) {
+  const { data } = req.body;
+
+  if (!Array.isArray(data)) {
+    return res.status(422).json({ message: "Input harus array" });
+  }
+
+  const results = {
+    skipped: [],
+    failed: []
+  };
+
+  for (const item of data) {
+    const { nis, rfid, nama, id_kelas } = item;
+
+    try {
+      const existing = await Siswa.find(nis);
+
+      if (existing.rows.length > 0) {
+        results.skipped.push({ nis, reason: "Nomor induk Siswa sudah ada" });
+        continue;
+      }
+
+      const existingRfid = await Siswa.findByRfid(rfid);
+      if(existingRfid.rows.length > 0){
+        results.skipped.push({rfid, reason : "Rfid Sudah terdaftar"});
+        continue;
+      }
+
+      await Siswa.create([nis, rfid, nama, id_kelas]);
+    } catch (err) {
+      results.failed.push({ nis, error: err.message });
+    }
+  }
+
+  return res.status(200).json({
+    message: "create siswa selesai",
+    ...results
+  });
+  },
+
   async update(req, res) {
     const { old_nis } = req.params;
 
