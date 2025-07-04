@@ -63,7 +63,13 @@ module.exports = {
       const existing = await Siswa.find(nis);
 
       if (existing.rows.length > 0) {
-        results.skipped.push({ nis, reason: "Sudah ada" });
+        results.skipped.push({ nis, reason: "Nomor induk Siswa sudah ada" });
+        continue;
+      }
+
+      const existingRfid = await Siswa.findByRfid(rfid);
+      if(existingRfid.rows.length > 0){
+        results.skipped.push({rfid, reason : "Rfid Sudah terdaftar"});
         continue;
       }
 
