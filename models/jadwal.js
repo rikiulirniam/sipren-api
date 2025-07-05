@@ -70,6 +70,16 @@ class Jadwal{
             })
         })
     }
+
+    static find(id_jadwal){
+        return new Promise((resolve, reject) => {
+            let q = `SELECT id_user FROM jadwal WHERE id_jadwal = $1`;
+            db.query(q, [id_jadwal], (err, data)=> {
+                if(err) return reject(err);
+                else resolve(data.rows);
+            })
+        })
+    }
 }
 
 module.exports = Jadwal

@@ -24,9 +24,10 @@ class DetailPresensi {
       det_presensi.present_at 
       FROM det_presensi 
       INNER JOIN presensi ON det_presensi.id_presensi = presensi.id_presensi 
+      INNER JOIN jadwal ON presensi.id_jadwal = jadwal.id_jadwal
       INNER JOIN materi ON presensi.id_materi = materi.id_materi 
-      INNER JOIN "user" ON presensi.id_user = "user".id_user 
-      INNER JOIN kelas ON presensi.id_kelas = kelas.id_kelas 
+      INNER JOIN "user" ON jadwal.id_user = "user".id_user 
+      INNER JOIN kelas ON jadwal.id_kelas = kelas.id_kelas 
       INNER JOIN siswa ON det_presensi.id_siswa = siswa.nis 
       INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan 
       WHERE det_presensi.id_presensi = $1`;
@@ -60,7 +61,7 @@ class DetailPresensi {
 
   static deleteByPresensi(id_presensi){
     return new Promise((resolve, reject) => {
-      let q = `DELETE FROM det_presensi WHERE id_presexnsi = $1`;
+      let q = `DELETE FROM det_presensi WHERE id_presensi = $1`;
 
       db.query(q, [id_presensi], (err, res) => {
         if(err) reject(err);

@@ -5,7 +5,8 @@ router.get('/mine', controller.index);
 router.get('/:id_presensi', controller.detail);
 router.get('/', controller.all);
 router.post('/', controller.create);
+router.post('/:id_presensi/end', controller.end)
 router.put('/:id_presensi', controller.update);
 router.delete('/:id_presensi', controller.delete);
 
-module.exports = router;
+module.exports = router;                                                

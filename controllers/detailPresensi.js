@@ -52,6 +52,10 @@ module.exports = {
         message: "presensi tidak ditemukan",
       });
     }
+
+    if(presensi.rows[0].presensi_selesai){
+      return res.status(403).json({message : "Presensi sudah ditutup dan tidak bisa tap lagi"})
+    }
     
     const siswa = await Siswa.findByRfid(rfid);
     if(siswa.rows.length === 0){

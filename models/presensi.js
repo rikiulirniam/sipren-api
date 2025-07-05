@@ -6,6 +6,7 @@ class Presensi {
       let q =
         `SELECT 
         presensi.id_presensi,
+        mapel.nama_mapel,
         materi.nama_materi,
          materi.deskripsi,
         "user".nama,
@@ -16,15 +17,15 @@ class Presensi {
           kelas.tingkat,
           presensi.id_presensi,
           presensi.presensi_mulai,
-          presensi.presensi_selesai ,
-          presensi.created_at
+          presensi.presensi_selesai
           FROM presensi 
           INNER JOIN materi 
           ON presensi.id_materi = materi.id_materi 
-          INNER JOIN "user" 
-          ON presensi.id_user = "user".id_user 
+          INNER JOIN jadwal ON presensi.id_jadwal = jadwal.id_jadwal
+          INNER JOIN "user" ON jadwal.id_user = "user".id_user 
           INNER JOIN kelas 
-          ON presensi.id_kelas = kelas.id_kelas 
+          ON jadwal.id_kelas = kelas.id_kelas 
+          INNER JOIN mapel ON jadwal.id_mapel = mapel.id_mapel
           INNER JOIN jurusan 
           ON kelas.id_jurusan = jurusan.id_jurusan`;
 
@@ -35,15 +36,15 @@ class Presensi {
     });
   }
 
-  static create(id_mapel, id_materi, id_user, id_kelas, presensi_mulai , presensi_selesai , created_at) {
+  static create(id_materi, id_jadwal, presensi_mulai) {
     return new Promise((resolve, reject) => {
       let q =
-        `INSERT INTO presensi(id_mapel, id_materi, id_user, id_kelas, presensi_mulai , presensi_selesai , created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+        `INSERT INTO presensi(id_materi, id_jadwal, presensi_mulai) VALUES($1, $2, $3) RETURNING *`;
 
-      db.query(q, [id_mapel, id_materi, id_user, id_kelas, presensi_mulai , presensi_selesai , created_at], (err, res) => {
+      db.query(q, [id_materi, id_jadwal, presensi_mulai], (err, res) => {
         if (err) reject(err);
 
-        if (res && res.rows[0].id_user) {
+        if (res) {
           resolve(res.rows[0].id_presensi);
         } else {
           reject(new Error("tidak dapat mengembalikan id"));
@@ -83,21 +84,27 @@ class Presensi {
       return new Promise((resolve, reject) => {
         let q =
           `SELECT 
-          mapel.nama_mapel AS mapel,
-          materi.nama_materi,
-          materi.deskripsi,
-          "user".nama AS nama_guru,
-          "user".username AS kode_guru,
-          kelas.id_kelas,
-          kelas.tingkat,
+        presensi.id_presensi,
+        mapel.nama_mapel,
+        materi.nama_materi,
+         materi.deskripsi,
+         kelas.id_kelas ,
+         kelas.no_kelas,
           jurusan.akronim,
-          kelas.no_kelas,
-          presensi.created_at 
-          FROM presensi INNER JOIN materi ON presensi.id_materi = materi.id_materi 
-          INNER JOIN "user" ON presensi.id_user = "user".id_user 
-          INNER JOIN kelas ON presensi.id_kelas = kelas.id_kelas 
-          INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan
-          INNER JOIN mapel ON presensi.id_mapel = mapel.id_mapel 
+          kelas.tingkat,
+          presensi.id_presensi,
+          presensi.presensi_mulai,
+          presensi.presensi_selesai
+          FROM presensi 
+          INNER JOIN materi 
+          ON presensi.id_materi = materi.id_materi 
+          INNER JOIN jadwal ON presensi.id_jadwal = jadwal.id_jadwal
+          INNER JOIN "user" ON jadwal.id_user = "user".id_user 
+          INNER JOIN kelas 
+          ON jadwal.id_kelas = kelas.id_kelas 
+          INNER JOIN mapel ON jadwal.id_mapel = mapel.id_mapel
+          INNER JOIN jurusan 
+          ON kelas.id_jurusan = jurusan.id_jurusan
           WHERE "user".id_user = $1`;
 
         db.query(q, [id_user], (err, res) => {
@@ -120,12 +127,14 @@ class Presensi {
         kelas.tingkat,
         jurusan.akronim,
         kelas.no_kelas,
-        presensi.created_at 
+        presensi.presensi_mulai,
+        presensi.presensi_selesai
         FROM presensi 
-        INNER JOIN mapel ON presensi.id_mapel = mapel.id_mapel
+        INNER JOIN jadwal ON presensi.id_jadwal = jadwal.id_jadwal
+        INNER JOIN mapel ON jadwal.id_mapel = mapel.id_mapel
         INNER JOIN materi ON presensi.id_materi = materi.id_materi 
-        INNER JOIN "user" ON presensi.id_user = "user".id_user 
-        INNER JOIN kelas ON presensi.id_kelas = kelas.id_kelas 
+        INNER JOIN "user" ON jadwal.id_user = "user".id_user 
+        INNER JOIN kelas ON jadwal.id_kelas = kelas.id_kelas 
         INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan
         WHERE presensi.id_presensi = $1`;
 
@@ -135,6 +144,33 @@ class Presensi {
       });
     });
   }
+
+  static find(id_presensi) {
+    return new Promise((resolve, reject) => {
+      let q =
+        `SELECT 
+        id_presensi FROM presensi WHERE presensi.id_presensi = $1`;
+
+      db.query(q, [id_presensi], (err, res) => {
+        if (err) reject(err);
+        else resolve(res.rows);
+      });
+    });
+  }
+
+  static end(id_presensi, presensi_selesai) {
+    return new Promise((resolve, reject) => {
+      let q =
+        `UPDATE presensi SET presensi_selesai = $2 WHERE presensi.id_presensi = $1`;
+
+      db.query(q, [id_presensi, presensi_selesai], (err, res) => {
+        if (err) reject(err);
+        else resolve(res.rows);
+      });
+    });
+  }
+
+
 }
 
 module.exports = Presensi;

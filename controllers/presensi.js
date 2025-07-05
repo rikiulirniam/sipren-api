@@ -5,6 +5,7 @@ const Presensi = require("../models/presensi");
 const dayjs = require("dayjs");
 const Siswa = require("../models/siswa");
 const DetailPresensi = require("../models/detailPresensi");
+const Jadwal = require("../models/jadwal");
 
 module.exports = {
   /**
@@ -21,47 +22,34 @@ module.exports = {
   async create(req, res) {
     const {
       id_kelas,
-      id_user,
+      id_jadwal,
       id_mapel,
-      presensi_mulai,
-      presensi_selesai,
       materi,
       deskripsi_materi,
     } = req.body;
 
     if (
-      (!id_kelas || !id_user || !id_mapel || !presensi_mulai || !presensi_selesai || !materi || !deskripsi_materi )
+      (!id_kelas || !id_jadwal || !id_mapel || !materi || !deskripsi_materi )
     ) {
       return res.status(500).json({
         message: "input data tidak valid",
       });
     }
 
+    const jadwalUser = await Jadwal.find(id_jadwal);
+    if(jadwalUser.length === 0) return res.status(404).json({message : "Jadwal tidak valid"}) 
+    if(jadwalUser[0].id_user != req.user.id) return res.status(403).json({message : "Anda bukan guru jadwal ini"})
+
     const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
-    const id_materi = await Materi.create( materi, deskripsi_materi);
-
-    if (!id_materi) {
-      return res.status(500).jsos({
-        message: "can't get data",
-      });
-    }
+    const id_materi = await Materi.create(materi, deskripsi_materi);
 
     try {
       const data = await Presensi.create(
-        id_mapel,
         id_materi,
-        id_user,
-        id_kelas,
-        presensi_mulai,
-        presensi_selesai,
+        id_jadwal,
         currentDateTime,
       );
-      if (!data) {
-        return res.status(500).json({
-          message: "can't get data",
-        });
-      }
 
       const siswa = await Siswa.findByKelas(id_kelas);
 
@@ -76,7 +64,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err)
-      return res.status(404).json({ message: "Not Found" });
+      return res.status(500).json({ message: "Internal server error" });
     }
   },
 
@@ -89,11 +77,7 @@ module.exports = {
         message: "presensi tidak ditemukan"
       });
     } else {
-      const { id_mapel, presensi_mulai, presensi_selesai, materi, deskripsi_materi } = req.body;
-
-      await Presensi.update(
-        id_mapel, presensi_mulai, presensi_selesai, id_presensi
-      );
+      const { materi, deskripsi_materi } = req.body;
 
       await Materi.update(materi, deskripsi_materi, data.rows[0].id_materi)
 
@@ -137,7 +121,9 @@ module.exports = {
     const { id_presensi } = req.params;
     try {
       const dataPresensi = await Presensi.findByPresensi(id_presensi);
+      if(dataPresensi.rows.length === 0) return res.status(404).json({message : "Presensi tidak ditemukan"})
       const dataDetailPresensi = await DetailPresensi.find(id_presensi);
+      if(dataDetailPresensi.length === 0) return res.status(404).json({message: "tidak ada siswa yang terdaftar pada Presensi ini"})
 
       dataPresensi.rows[0].detail_presensi = dataDetailPresensi;
 
@@ -149,4 +135,20 @@ module.exports = {
       return res.status(500).json({ message: "internal server error" });
     }
   },
+
+  async end(req, res){
+    const {id_presensi} = req.params;
+
+    const presensi = await Presensi.find(id_presensi);
+    if(presensi.length === 0){
+      return res.status(404).json({message : "Presensi tidak ditemukan"})
+    }
+    const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    
+    await Presensi.end(id_presensi, currentDateTime);
+
+    return res.status(200).json({message : "Presensi berhasil ditutup"})
+
+
+  }
 };
