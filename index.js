@@ -32,6 +32,7 @@ app.use("/materi",Verify.verifyToken, require("./routes/materi"));
 app.use("/presensi", Verify.verifyToken, require("./routes/presensi"));
 app.use("/detail_presensi",Verify.verifyToken, require("./routes/detailPresensi"));
 app.use("/siswa",Verify.verifyToken, require("./routes/siswa"));
+app.use("/jadwal", Verify.verifyToken, require("./routes/jadwal"));
 app.use("/tingkat",Verify.verifyToken, require("./routes/tingkat"));
 app.use(
   "/users",
