@@ -23,14 +23,14 @@ module.exports = {
       id_kelas,
       id_user,
       id_mapel,
-      jam_started,
-      jam_ended,
+      presensi_mulai,
+      presensi_selesai,
       materi,
       deskripsi_materi,
     } = req.body;
 
     if (
-      (!id_kelas || !id_user || !id_mapel || !jam_started || !jam_ended || !materi || !deskripsi_materi )
+      (!id_kelas || !id_user || !id_mapel || !presensi_mulai || !presensi_selesai || !materi || !deskripsi_materi )
     ) {
       return res.status(500).json({
         message: "input data tidak valid",
@@ -53,8 +53,8 @@ module.exports = {
         id_materi,
         id_user,
         id_kelas,
-        jam_started,
-        jam_ended,
+        presensi_mulai,
+        presensi_selesai,
         currentDateTime,
       );
       if (!data) {
@@ -89,10 +89,10 @@ module.exports = {
         message: "presensi tidak ditemukan"
       });
     } else {
-      const { id_mapel, jam_started, jam_ended, materi, deskripsi_materi } = req.body;
+      const { id_mapel, presensi_mulai, presensi_selesai, materi, deskripsi_materi } = req.body;
 
       await Presensi.update(
-        id_mapel, jam_started, jam_ended, id_presensi
+        id_mapel, presensi_mulai, presensi_selesai, id_presensi
       );
 
       await Materi.update(materi, deskripsi_materi, data.rows[0].id_materi)

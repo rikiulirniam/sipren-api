@@ -15,8 +15,8 @@ class Presensi {
           jurusan.akronim,
           kelas.tingkat,
           presensi.id_presensi,
-          presensi.jam_started,
-          presensi.jam_ended ,
+          presensi.presensi_mulai,
+          presensi.presensi_selesai ,
           presensi.created_at
           FROM presensi 
           INNER JOIN materi 
@@ -35,12 +35,12 @@ class Presensi {
     });
   }
 
-  static create(id_mapel, id_materi, id_user, id_kelas, jam_started , jam_ended , created_at) {
+  static create(id_mapel, id_materi, id_user, id_kelas, presensi_mulai , presensi_selesai , created_at) {
     return new Promise((resolve, reject) => {
       let q =
-        `INSERT INTO presensi(id_mapel, id_materi, id_user, id_kelas, jam_started , jam_ended , created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+        `INSERT INTO presensi(id_mapel, id_materi, id_user, id_kelas, presensi_mulai , presensi_selesai , created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
-      db.query(q, [id_mapel, id_materi, id_user, id_kelas, jam_started , jam_ended , created_at], (err, res) => {
+      db.query(q, [id_mapel, id_materi, id_user, id_kelas, presensi_mulai , presensi_selesai , created_at], (err, res) => {
         if (err) reject(err);
 
         if (res && res.rows[0].id_user) {
@@ -52,14 +52,14 @@ class Presensi {
     });
   }
 
-  static update(id_mapel, jam_started, jam_ended, id_presensi) {
+  static update(id_mapel, presensi_mulai, presensi_selesai, id_presensi) {
     return new Promise((resolve, reject) => {
       let q =
-        "UPDATE presensi SET id_mapel = $1, jam_started = $2, jam_ended = $3 WHERE id_presensi = $4";
+        "UPDATE presensi SET id_mapel = $1, presensi_mulai = $2, presensi_selesai = $3 WHERE id_presensi = $4";
 
       db.query(
         q,
-        [id_mapel, jam_started, jam_ended, id_presensi],
+        [id_mapel, presensi_mulai, presensi_selesai, id_presensi],
         (err, res) => {
           if (err) reject(err);
           else resolve(res);

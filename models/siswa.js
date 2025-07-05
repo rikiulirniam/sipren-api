@@ -105,7 +105,7 @@ class Siswa {
           siswa.rfid, 
           siswa.nama
         FROM siswa 
-        WHERE siswa.id_kelas = $1
+        WHERE siswa.id_kelas = $1 ORDER BY siswa.nama ASC
       `;
 
       db.query(query, [id_kelas], (err, results) => {
