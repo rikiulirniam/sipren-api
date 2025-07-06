@@ -14,28 +14,43 @@ class Jadwal{
         })
     }
 
-    static checkJadwal(id_kelas, hari, jadwal_selesai, jadwal_mulai){
+    static update(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, id_jadwal){
+        return new Promise((resolve, reject) => {
+            let q = `UPDATE jadwal SET id_kelas = $1, hari=$2, jadwal_mulai=$3, jadwal_selesai=$4, id_mapel=$5, id_ruang=$6, id_user=$7 WHERE id_jadwal = $8`;
+
+             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, id_jadwal], (err, res) => {
+                if(err) return reject(err);
+                else resolve(res)
+             })
+        })
+    }
+
+
+
+    static checkJadwal(id_kelas, hari, jadwal_selesai, jadwal_mulai, id_jadwal=null){
         return new Promise((resolve, reject) => {
             let q = `SELECT * FROM jadwal
          WHERE id_kelas = $1 AND hari = $2
          AND jadwal_mulai <= $4 AND jadwal_selesai >= $3
+         AND id_jadwal != $5
          LIMIT 1`
 
-         db.query(q, [id_kelas, hari, jadwal_selesai, jadwal_mulai], (err, res)=> {
+         db.query(q, [id_kelas, hari, jadwal_selesai, jadwal_mulai, id_jadwal], (err, res)=> {
             if(err) return reject(err);
             else resolve(res);
          })
         })
     }
 
-    static checkRuangan(id_ruang, hari, jadwal_selesai, jadwal_mulai){
+    static checkRuangan(id_ruang, hari, jadwal_selesai, jadwal_mulai, id_jadwal=null){
         return new Promise((resolve, reject) => {
             let q = `SELECT * FROM jadwal
          WHERE id_ruang = $1 AND hari = $2
          AND jadwal_mulai <= $4 AND jadwal_selesai >= $3
+         AND id_jadwal!=$5
          LIMIT 1`;
 
-          db.query(q, [id_ruang, hari, jadwal_selesai, jadwal_mulai], (err, res)=> {
+          db.query(q, [id_ruang, hari, jadwal_selesai, jadwal_mulai, id_jadwal], (err, res)=> {
             if(err) return reject(err);
             else resolve(res);
          })
@@ -73,10 +88,66 @@ class Jadwal{
 
     static find(id_jadwal){
         return new Promise((resolve, reject) => {
-            let q = `SELECT id_user FROM jadwal WHERE id_jadwal = $1`;
+            let q = `SELECT
+            jadwal.id_jadwal,
+            jadwal.hari,
+            jadwal.jadwal_mulai,
+            jadwal.jadwal_selesai,
+            jadwal.id_kelas,
+            kelas.tingkat,
+            jurusan.akronim,
+            kelas.no_kelas,
+            "user".nama AS nama_guru,
+            "user".username,
+            ruang.nama_ruang,
+            mapel.nama_mapel
+            FROM jadwal 
+            INNER JOIN kelas ON jadwal.id_kelas = kelas.id_kelas
+            INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan
+            INNER JOIN mapel ON jadwal.id_mapel = mapel.id_mapel
+            INNER JOIN "user" ON jadwal.id_user="user".id_user
+            INNER JOIN ruang ON jadwal.id_ruang = ruang.id_ruang WHERE id_jadwal = $1`;
             db.query(q, [id_jadwal], (err, data)=> {
                 if(err) return reject(err);
                 else resolve(data.rows);
+            })
+        })
+    }
+
+    static all(){
+        return new Promise((resolve, reject) => {
+            let q= `SELECT
+            jadwal.id_jadwal,
+            jadwal.hari,
+            jadwal.jadwal_mulai,
+            jadwal.jadwal_selesai,
+            jadwal.id_kelas,
+            kelas.tingkat,
+            jurusan.akronim,
+            kelas.no_kelas,
+            "user".nama AS nama_guru,
+            "user".username,
+            ruang.nama_ruang,
+            mapel.nama_mapel
+            FROM jadwal 
+            INNER JOIN kelas ON jadwal.id_kelas = kelas.id_kelas
+            INNER JOIN jurusan ON kelas.id_jurusan = jurusan.id_jurusan
+            INNER JOIN mapel ON jadwal.id_mapel = mapel.id_mapel
+            INNER JOIN "user" ON jadwal.id_user="user".id_user
+            INNER JOIN ruang ON jadwal.id_ruang = ruang.id_ruang`;
+            db.query(q, [], (err, res) => {
+                if(err) return reject(err);
+                else  resolve(res)
+            })
+        })
+    }
+
+    static delete(id_jadwal){
+        return new Promise((resolve, reject) => {
+            let q = `DELETE FROM jadwal WHERE id_jadwal = $1`
+            db.query(q,[id_jadwal], (err,res) =>{
+                if(err)return reject(err);
+                else resolve(res);
             })
         })
     }
