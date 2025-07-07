@@ -5,7 +5,7 @@ module.exports = {
     async index(req, res){
         const {user} = req
         
-        const data = await Jadwal.findByUser(user.id, getHariWIB());
+        const data = await Jadwal.findByUser(user.id, "sabtu");
         
         if(!data || data.length <= 0){
             return res.status(404).json({message : "Jadwal anda kosong hari ini"})
@@ -24,6 +24,7 @@ module.exports = {
 
         return res.status(200).json(data)
     },
+
   async create(req, res) {
     const {
       id_kelas,
