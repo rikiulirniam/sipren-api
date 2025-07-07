@@ -4,7 +4,7 @@ const { getHariWIB, getWaktuWIB } = require('../utils/status');
 module.exports = {
   async all(req, res){
     const data = await Jadwal.all();
-    if(data.rows.length){
+    if(data.rows.length === 0){
       return res.status(404).json({message : "Belum ada jadwal dibuat"})
     }
     return res.status(200).json({data : data.rows})
