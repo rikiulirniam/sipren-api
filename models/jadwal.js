@@ -85,6 +85,7 @@ class Jadwal{
             jurusan.akronim,
             kelas.no_kelas,
             ruang.nama_ruang,
+            mapel.id_mapel,
             mapel.nama_mapel
             FROM jadwal 
             INNER JOIN kelas ON jadwal.id_kelas = kelas.id_kelas

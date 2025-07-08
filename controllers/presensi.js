@@ -106,10 +106,9 @@ module.exports = {
   },
 
   async index(req, res) {
-    const refreshToken = req.cookies.refreshToken;
-     if (!refreshToken) return res.status(401).json("anda tidak terdeteksi, coba login ulang");
+    // const refreshToken = req.cookies.refreshToken;
+    //  if (!refreshToken) return res.status(401).json("anda tidak terdeteksi, coba login ulang");
     try {
-
       const data = await Presensi.findByUser(req.user.id);
       return res.status(200).json({ data: data.rows });
     } catch (error) {
