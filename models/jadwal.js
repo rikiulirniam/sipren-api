@@ -31,32 +31,47 @@ class Jadwal{
         return new Promise((resolve, reject) => {
             let q = `SELECT * FROM jadwal
          WHERE id_kelas = $1 AND hari = $2
-         AND jadwal_mulai <= $4 AND jadwal_selesai >= $3
-         AND id_jadwal != $5
-         LIMIT 1`
+         AND jadwal_mulai <= $4 AND jadwal_selesai >= $3 `
 
-         db.query(q, [id_kelas, hari, jadwal_selesai, jadwal_mulai, id_jadwal], (err, res)=> {
+         const params = [id_kelas, hari, jadwal_selesai, jadwal_mulai];
+
+            if (id_jadwal !== null) {
+            q += ` AND id_jadwal != $5`;
+            params.push(id_jadwal);
+            }
+
+            q += ` LIMIT 1`;
+
+         db.query(q, params, (err, res)=> {
             if(err) return reject(err);
             else resolve(res);
          })
         })
     }
-
-    static checkRuangan(id_ruang, hari, jadwal_selesai, jadwal_mulai, id_jadwal=null){
+    static checkRuangan(id_ruang, hari, jadwal_selesai, jadwal_mulai, id_jadwal = null) {
         return new Promise((resolve, reject) => {
-            let q = `SELECT * FROM jadwal
-         WHERE id_ruang = $1 AND hari = $2
-         AND jadwal_mulai <= $4 AND jadwal_selesai >= $3
-         AND id_jadwal!=$5
-         LIMIT 1`;
+            let q = `
+            SELECT * FROM jadwal
+            WHERE id_ruang = $1 AND hari = $2
+            AND jadwal_mulai < $3 AND jadwal_selesai > $4
+            `;
 
-          db.query(q, [id_ruang, hari, jadwal_selesai, jadwal_mulai, id_jadwal], (err, res)=> {
-            if(err) return reject(err);
+            const params = [id_ruang, hari, jadwal_selesai, jadwal_mulai];
+
+            if (id_jadwal !== null) {
+            q += ` AND id_jadwal != $5`;
+            params.push(id_jadwal);
+            }
+
+            q += ` LIMIT 1`;
+
+            db.query(q, params, (err, res) => {
+            if (err) return reject(err);
             else resolve(res);
-         })
-
-        })
+            });
+        });
     }
+
     static findByUser(id_user, hari){
         return new Promise((resolve, reject) => {
             let q = `
