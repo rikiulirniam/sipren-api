@@ -74,6 +74,7 @@ module.exports = {
     }
   },
 
+
   async delete(req, res) {
     const { id_user } = req.params;
 
