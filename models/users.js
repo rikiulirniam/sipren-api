@@ -75,6 +75,17 @@ class Users {
     });
   }
 
+  static changePassword(id_user, new_password){
+    return new Promise((resolve, reject) => {
+      let q = `UPDATE "user" SET password = $1 WHERE id_user = $2`;
+
+      db.query(q, [new_password, id_user], (err, res)=> {
+        if(err) return reject(err);
+        else resolve(res);
+      })
+    })
+  }
+
   static findRefreshToken(refreshToken) {
     return new Promise((resolve, reject) => {
       let q = `SELECT * FROM "user" WHERE "refresh_token" = $1`;

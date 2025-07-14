@@ -18,9 +18,9 @@ module.exports = {
     
             const userData = await Users.find(username);
             
-            const user = userData.rows[0];
+            const user = userData[0];
             
-            if(userData.rows.length === 0){
+            if(userData.length === 0){
                 return res.status(401).json({message: 'User tidak ditemukan '});
             }
             const isMatch = await bcrypt.compare(password, user?.password);
@@ -85,13 +85,15 @@ module.exports = {
       return res.status(400).json({ message: "Password minimal 6 karakter." });
     }
 
-    const existingUser = await await Users.find(username);
+    const existingUser = await Users.find(username);
     if (existingUser.length > 0) {
       return res.status(400).json({ message: "Username sudah digunakan." });
     }
 
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
+
+    
 
         try{
             await Users.create([ username, nama, hashPassword, level]);
@@ -127,6 +129,27 @@ module.exports = {
           console.log(error);
         }
       }, 
+      
+    async changePassword(req, res){
+        const {current_password, new_password, confirm_new_password} = req.body
+
+        if(!current_password || !new_password || !confirm_new_password) {
+            return res.status(422).json({message : "Kolom tidak lengkap"})
+        }
+        const currentUser = await Users.findById(req.user.id);
+
+        const isMatch = await bcrypt.compare(current_password, currentUser.rows[0].password)
+
+        if(!isMatch) return res.status(403).json({message : "Password saat ini salah"})
+        if(new_password != confirm_new_password) return res.status(422).json({message : "Password baru tidak cocok"})
+
+            const salt = await bcrypt.genSalt();
+            const password = await bcrypt.hash(new_password, salt);
+
+        await Users.changePassword(req.user.id, password);
+
+        return res.status(200).json({message : "Password diganti"})
+    },
     
 
     async logout(req, res){
