@@ -59,7 +59,7 @@ class Users {
 
       db.query(q, [username], (err, data) => {
         if (err) reject(err);
-        else resolve(data);
+        else resolve(data.rows);
       });
     });
   }
