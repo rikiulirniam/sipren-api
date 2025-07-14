@@ -28,7 +28,7 @@ module.exports = {
       return res.status(400).json({ message: "Password minimal 6 karakter." });
     }
 
-    const existingUser = await await Users.find(username);
+    const existingUser = await Users.find(username);
     if (existingUser.length > 0) {
       return res.status(400).json({ message: "Username sudah digunakan." });
     }
