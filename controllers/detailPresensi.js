@@ -25,17 +25,18 @@ module.exports = {
 
   async editKeterangan(req, res){
     const {id_detail_presensi} = req.params
-    const {keterangan} = req.body;
+    const {keterangan, deskripsi_keterangan} = req.body;
 
     if(!keterangan){
       return res.status(200).json({message : "keterangan harus diisi"})
     }
+
     const detail_presensi = await DetailPresensi.findById(id_detail_presensi);
       if(detail_presensi.rows.length === 0) {
       return res.status(404).json({message : "data tidak ditemukan"})
     }
 
-    await DetailPresensi.updateKeterangan(keterangan, id_detail_presensi);
+    await DetailPresensi.updateKeterangan(keterangan, deskripsi_keterangan, id_detail_presensi);
     
     return res.status(200).json({message : "keterangan berhasil diubah!"})
   },

@@ -1,24 +1,24 @@
 const db = require("../utils/db");
 
 class Jadwal{
-    static create(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user){
+    static create(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen){
         return new Promise((resolve, reject) => {
             let q = `INSERT INTO jadwal
-             (id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+             (id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7,$8)`;
 
-             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user], (err, res) => {
+             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen], (err, res) => {
                 if(err) return reject(err);
                 else resolve(res)
              })
         })
     }
 
-    static update(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, id_jadwal){
+    static update(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen, id_jadwal){
         return new Promise((resolve, reject) => {
-            let q = `UPDATE jadwal SET id_kelas = $1, hari=$2, jadwal_mulai=$3, jadwal_selesai=$4, id_mapel=$5, id_ruang=$6, id_user=$7 WHERE id_jadwal = $8`;
+            let q = `UPDATE jadwal SET id_kelas = $1, hari=$2, jadwal_mulai=$3, jadwal_selesai=$4, id_mapel=$5, id_ruang=$6, id_user=$7, $9 WHERE id_jadwal = $8`;
 
-             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, id_jadwal], (err, res) => {
+             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, id_jadwal, pecahan_absen], (err, res) => {
                 if(err) return reject(err);
                 else resolve(res)
              })
@@ -104,12 +104,13 @@ class Jadwal{
 
     static find(id_jadwal){
         return new Promise((resolve, reject) => {
-            let q = `SELECT
+            let q = `SELECT 
             jadwal.id_jadwal,
             jadwal.hari,
             jadwal.jadwal_mulai,
             jadwal.jadwal_selesai,
             jadwal.id_kelas,
+            jadwal.pecahan_absen,
             kelas.tingkat,
             jurusan.akronim,
             kelas.no_kelas,

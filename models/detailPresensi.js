@@ -21,6 +21,7 @@ class DetailPresensi {
       siswa.nama,
       det_presensi.id_det, 
       det_presensi.keterangan,
+      det_presensi.deskripsi_keterangan,
       det_presensi.present_at 
       FROM det_presensi 
       INNER JOIN presensi ON det_presensi.id_presensi = presensi.id_presensi 
@@ -70,15 +71,16 @@ class DetailPresensi {
     })
   }
 
-  static updateKeterangan(keterangan, id_detail_presensi) {
+  static updateKeterangan(keterangan, deskripsi_keterangan=null, id_detail_presensi) {
     return new Promise((resolve, reject) => {
       let q =
         `UPDATE det_presensi
-          SET keterangan = $1
-          WHERE id_det = $2
+          SET keterangan = $1,
+          deskripsi_keterangan = $2
+          WHERE id_det = $3
           `;
 
-      db.query(q, [keterangan, id_detail_presensi], (err, res) => {
+      db.query(q, [keterangan, deskripsi_keterangan, id_detail_presensi], (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
