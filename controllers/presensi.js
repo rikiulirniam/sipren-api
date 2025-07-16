@@ -19,52 +19,75 @@ module.exports = {
     return res.status(200).json({ data });
   },
 
-  async create(req, res) {
+    async create(req, res) {
     const {
-      id_kelas,
       id_jadwal,
       id_mapel,
       materi,
       deskripsi_materi,
     } = req.body;
 
-    if (
-      (!id_kelas || !id_jadwal || !id_mapel || !materi || !deskripsi_materi )
-    ) {
-      return res.status(500).json({
-        message: "input data tidak valid",
+    // Validasi input dasar
+    if ( !id_jadwal || !id_mapel || !materi || !deskripsi_materi) {
+      return res.status(422).json({
+        message: "Input data tidak valid",
       });
     }
 
-    const jadwalUser = await Jadwal.find(id_jadwal);
-    if(jadwalUser.length === 0) return res.status(404).json({message : "Jadwal tidak valid"}) 
-    if(jadwalUser[0].id_user != req.user.id) return res.status(403).json({message : "Anda bukan guru jadwal ini"})
-
-    const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
-
-    const id_materi = await Materi.create(materi, deskripsi_materi);
-
     try {
-      const data = await Presensi.create(
+      // Cek validitas jadwal dan apakah user yang login adalah pemiliknya
+      const jadwalUser = await Jadwal.find(id_jadwal);
+      if (jadwalUser.length === 0) {
+        return res.status(404).json({ message: "Jadwal tidak valid" });
+      }
+
+      if (jadwalUser[0].id_user != req.user.id) {
+        return res.status(403).json({ message: "Anda bukan guru jadwal ini" });
+      }
+
+      const pecahan_absen = jadwalUser[0].pecahan_absen;
+      const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
+
+      // Buat materi
+      const id_materi = await Materi.create(materi, deskripsi_materi);
+
+      // Buat presensi utama
+      const id_presensi = await Presensi.create(
         id_materi,
         id_jadwal,
-        currentDateTime,
+        currentDateTime
       );
 
-      const siswa = await Siswa.findByKelas(id_kelas);
+      // Ambil daftar siswa berdasarkan kelas
+      const siswaResult = await Siswa.findByKelas(jadwalUser[0].id_kelas);
 
-      for (let item of siswa.rows) {
-        await DetailPresensi.create(data, item.nis, "T", null);
+
+      // Fungsi bagi siswa sesuai pecahan
+      function bagiSiswa(siswa) {
+        const tengah = Math.ceil(siswa.length / 2);
+        return {
+          kecil: siswa.slice(0, tengah),
+          besar: siswa.slice(tengah),
+          semua: siswa
+        };
       }
+
+      const siswaTerpilih = bagiSiswa(siswaResult.rows)[pecahan_absen];
+
+      // Insert semua siswa ke detail_presensi dengan status default "T" (tidak hadir)
+      for (const item of siswaTerpilih) {
+        await DetailPresensi.create(id_presensi, item.nis, "T", null);
+      }
+
       return res.status(200).json({
-        message: "berhasil input presensi",
+        message: "Presensi berhasil dibuat",
         data: {
-          id_presensi: data,
+          id_presensi,
         },
       });
     } catch (err) {
-      console.log(err)
-      return res.status(500).json({ message: "Internal server error" });
+      console.error(err);
+      return res.status(500).json({ message: "Terjadi kesalahan pada server" });
     }
   },
 
@@ -106,8 +129,6 @@ module.exports = {
   },
 
   async index(req, res) {
-    // const refreshToken = req.cookies.refreshToken;
-    //  if (!refreshToken) return res.status(401).json("anda tidak terdeteksi, coba login ulang");
     try {
       const data = await Presensi.findByUser(req.user.id);
       return res.status(200).json({ data: data.rows });

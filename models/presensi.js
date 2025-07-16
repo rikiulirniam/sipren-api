@@ -145,6 +145,19 @@ class Presensi {
     });
   }
 
+  static findPresensiByJadwal(id_jadwal){
+    return new Promise((resolve, reject) => {
+      let q = `SELECT presensi_selesai FROM presensi WHERE id_jadwal = $1
+              ORDER BY presensi_mulai DESC
+              LIMIT 1;
+              `
+      db.query(q, [id_jadwal], (err, res) => {
+        if(err) return reject(err);
+        else resolve(res.rows[0])
+      })
+    })
+  }
+
   static find(id_presensi) {
     return new Promise((resolve, reject) => {
       let q =

@@ -64,6 +64,16 @@ class Mapel {
         })
     }
 
+    static find(id_mapel){
+        return new Promise((resolve, reject) => {
+            let q = `SELECT * FROM mapel WHERE id_mapel = $1`;
+            db.query(q, [id_mapel], (err, res) => {
+            if(err) return reject(err);
+            else resolve(res.rows[0])
+            })
+        })
+    }
+
     
 }
 
