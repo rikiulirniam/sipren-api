@@ -153,7 +153,7 @@ module.exports = {
       }
 
       // === Insert ke tabel jadwal ===
-      await Jadwal.update(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user,id_jadwal);
+      await Jadwal.update(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen,id_jadwal);
 
       return res.status(200).json({ message: "Berhasil memperbarui jadwal." });
     } catch (err) {
