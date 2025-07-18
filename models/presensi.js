@@ -147,7 +147,7 @@ class Presensi {
 
   static findPresensiByJadwal(id_jadwal){
     return new Promise((resolve, reject) => {
-      let q = `SELECT presensi_selesai FROM presensi WHERE id_jadwal = $1
+      let q = `SELECT id_presensi, presensi_mulai, presensi_selesai FROM presensi WHERE id_jadwal = $1
               ORDER BY presensi_mulai DESC
               LIMIT 1;
               `
