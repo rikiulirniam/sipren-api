@@ -37,8 +37,8 @@ module.exports = {
     async delete(req, res){
         const {id_mapel} = req.params
         const mapel = await Mapel.find(id_mapel);
-        
-        if(mapel.rows.length === 0){
+
+        if(!mapel){
             return res.status(404).json({
                 message : "Mapel tidak ditemukan"
             })
@@ -47,7 +47,7 @@ module.exports = {
         await Mapel.delete(id_mapel);
 
         return res.status(200).json({
-            message : `Mapel ${mapel.rows[0].nama_mapel} berhasil dihapus`
+            message : `Mapel ${mapel.nama_mapel} berhasil dihapus`
         })
 
     }
