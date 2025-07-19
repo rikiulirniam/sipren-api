@@ -27,7 +27,7 @@ module.exports = {
         const result = await Promise.all(
           data.map(async (e) => {
             const latestPresensi = await Presensi.findPresensiByJadwal(e.id_jadwal);
-            e.presensi_selesai = latestPresensi || null;
+            e.latest_presensi = latestPresensi || null;
 
             e.status = e.jadwal_mulai <= now && e.jadwal_selesai >= now;
 
