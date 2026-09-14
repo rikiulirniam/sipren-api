@@ -27,8 +27,8 @@ module.exports = {
     const {id_detail_presensi} = req.params
     const {keterangan, deskripsi_keterangan} = req.body;
 
-    if(!keterangan){
-      return res.status(200).json({message : "keterangan harus diisi"})
+    if(!["H", "T", "I", "S"].includes(keterangan)){
+      return res.status(422).json({message : "keterangan harus H, T, I, atau S"})
     }
 
     const detail_presensi = await DetailPresensi.findById(id_detail_presensi);
@@ -72,6 +72,10 @@ module.exports = {
     }
 
     const isPresent = await DetailPresensi.findIsPresent(id_presensi, siswa.rows[0].nis);
+
+    if (isPresent.rows.length === 0) {
+      return res.status(409).json({ message: "Siswa tidak terdaftar pada presensi ini" });
+    }
 
     if(isPresent.rows[0].keterangan === "H"){
       return res.status(422).json({

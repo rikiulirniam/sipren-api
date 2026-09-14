@@ -6,6 +6,7 @@ const dayjs = require("dayjs");
 const Siswa = require("../models/siswa");
 const DetailPresensi = require("../models/detailPresensi");
 const Jadwal = require("../models/jadwal");
+const db = require("../utils/db");
 
 module.exports = {
   /**
@@ -22,13 +23,12 @@ module.exports = {
     async create(req, res) {
     const {
       id_jadwal,
-      id_mapel,
       materi,
       deskripsi_materi,
     } = req.body;
 
     // Validasi input dasar
-    if ( !id_jadwal || !id_mapel || !materi || !deskripsi_materi) {
+    if (!id_jadwal || !materi || !deskripsi_materi) {
       return res.status(422).json({
         message: "Input data tidak valid",
       });
@@ -45,21 +45,43 @@ module.exports = {
         return res.status(403).json({ message: "Anda bukan guru jadwal ini" });
       }
 
+      const activePresensi = await Presensi.findOpenByJadwal(id_jadwal);
+      if (activePresensi) {
+        return res.status(409).json({
+          message: "Jadwal ini masih memiliki presensi yang aktif",
+          data: activePresensi,
+        });
+      }
+
       const pecahan_absen = jadwalUser[0].pecahan_absen;
       const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
-      // Buat materi
-      const id_materi = await Materi.create(materi, deskripsi_materi);
-
-      // Buat presensi utama
-      const id_presensi = await Presensi.create(
-        id_materi,
-        id_jadwal,
-        currentDateTime
-      );
-
-      // Ambil daftar siswa berdasarkan kelas
-      const siswaResult = await Siswa.findByKelas(jadwalUser[0].id_kelas);
+      const client = await db.connect();
+      let id_presensi;
+      try {
+        await client.query("BEGIN");
+        const materiResult = await client.query(
+          "INSERT INTO materi (nama_materi, deskripsi) VALUES ($1, $2) RETURNING id_materi",
+          [materi, deskripsi_materi]
+        );
+        const presensiResult = await client.query(
+          `INSERT INTO presensi
+            (id_materi, id_jadwal, id_user, id_kelas, jam_started, jam_ended, id_mapel, presensi_mulai)
+           VALUES ($1, $2, $3, $4, EXTRACT(HOUR FROM CURRENT_TIMESTAMP)::integer, NULL, NULL, $5)
+           RETURNING id_presensi`,
+          [
+            materiResult.rows[0].id_materi,
+            id_jadwal,
+            jadwalUser[0].id_user,
+            jadwalUser[0].id_kelas,
+            currentDateTime,
+          ]
+        );
+        id_presensi = presensiResult.rows[0].id_presensi;
+        const siswaResult = await client.query(
+          "SELECT nis FROM siswa WHERE id_kelas = $1 ORDER BY nama ASC",
+          [jadwalUser[0].id_kelas]
+        );
 
 
       // Fungsi bagi siswa sesuai pecahan
@@ -72,11 +94,21 @@ module.exports = {
         };
       }
 
-      const siswaTerpilih = bagiSiswa(siswaResult.rows)[pecahan_absen];
+        const siswaTerpilih = bagiSiswa(siswaResult.rows)[pecahan_absen];
 
       // Insert semua siswa ke detail_presensi dengan status default "T" (tidak hadir)
-      for (const item of siswaTerpilih) {
-        await DetailPresensi.create(id_presensi, item.nis, "T", null);
+        for (const item of siswaTerpilih) {
+          await client.query(
+            "INSERT INTO det_presensi (id_presensi, id_siswa, keterangan, present_at) VALUES ($1, $2, $3, $4)",
+            [id_presensi, item.nis, "T", null]
+          );
+        }
+        await client.query("COMMIT");
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
       }
 
       return res.status(200).json({
@@ -99,20 +131,35 @@ module.exports = {
       return res.status(404).json({
         message: "presensi tidak ditemukan"
       });
-    } else {
-      const { materi, deskripsi_materi } = req.body;
-
-      await Materi.update(materi, deskripsi_materi, data.rows[0].id_materi)
-
-      res.status(200).json({
-        message: "berhasil update presensi",
-      });
     }
+
+    if (data.rows[0].id_user != req.user.id) {
+      return res.status(403).json({ message: "Anda bukan guru presensi ini" });
+    }
+
+    const { materi, deskripsi_materi } = req.body;
+    if (!materi?.trim() || !deskripsi_materi?.trim()) {
+      return res.status(422).json({ message: "Materi dan deskripsi wajib diisi" });
+    }
+
+    await Materi.update(materi.trim(), deskripsi_materi.trim(), data.rows[0].id_materi)
+
+    return res.status(200).json({ message: "berhasil update presensi" });
   },
 
   async delete(req, res) {
     const { id_presensi } = req.params;
-
+                    `INSERT INTO presensi
+                      (id_materi, id_jadwal, id_user, id_kelas, jam_started, jam_ended, id_mapel, presensi_mulai)
+                     VALUES ($1, $2, $3, $4, EXTRACT(HOUR FROM CURRENT_TIMESTAMP)::integer, NULL, NULL, $5)
+                     RETURNING id_presensi`,
+                    [
+                      materiResult.rows[0].id_materi,
+                      id_jadwal,
+                      jadwalUser[0].id_user,
+                      jadwalUser[0].id_kelas,
+                      currentDateTime,
+                    ]
     const data = await Presensi.findByPresensi(id_presensi);
 
     if (data.rows.length === 0) {
@@ -165,7 +212,10 @@ module.exports = {
     }
     const currentDateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
     
-    await Presensi.end(id_presensi, currentDateTime);
+    const ended = await Presensi.end(id_presensi, currentDateTime);
+    if (!ended) {
+      return res.status(409).json({ message: "Presensi sudah ditutup" });
+    }
 
     return res.status(200).json({message : "Presensi berhasil ditutup"})
 

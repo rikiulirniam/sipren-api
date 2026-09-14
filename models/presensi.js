@@ -53,6 +53,18 @@ class Presensi {
     });
   }
 
+  static findOpenByJadwal(id_jadwal) {
+    return new Promise((resolve, reject) => {
+      const q = `SELECT id_presensi FROM presensi
+        WHERE id_jadwal = $1 AND presensi_selesai IS NULL LIMIT 1`;
+
+      db.query(q, [id_jadwal], (err, res) => {
+        if (err) reject(err);
+        else resolve(res.rows[0] || null);
+      });
+    });
+  }
+
   static update(id_mapel, presensi_mulai, presensi_selesai, id_presensi) {
     return new Promise((resolve, reject) => {
       let q =
@@ -127,6 +139,12 @@ class Presensi {
         kelas.tingkat,
         jurusan.akronim,
         kelas.no_kelas,
+        presensi.id_presensi,
+        presensi.id_jadwal,
+        presensi.id_materi,
+        jadwal.id_user,
+        jadwal.id_mapel,
+        jadwal.pecahan_absen,
         presensi.presensi_mulai,
         presensi.presensi_selesai
         FROM presensi 
@@ -174,11 +192,15 @@ class Presensi {
   static end(id_presensi, presensi_selesai) {
     return new Promise((resolve, reject) => {
       let q =
-        `UPDATE presensi SET presensi_selesai = $2 WHERE presensi.id_presensi = $1`;
+          `UPDATE presensi
+           SET presensi_selesai = $2,
+               jam_ended = EXTRACT(HOUR FROM CURRENT_TIMESTAMP)::integer
+         WHERE presensi.id_presensi = $1 AND presensi_selesai IS NULL
+         RETURNING id_presensi, presensi_selesai`;
 
       db.query(q, [id_presensi, presensi_selesai], (err, res) => {
         if (err) reject(err);
-        else resolve(res.rows);
+        else resolve(res.rows[0] || null);
       });
     });
   }

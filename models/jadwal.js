@@ -16,9 +16,9 @@ class Jadwal{
 
     static update(id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen, id_jadwal){
         return new Promise((resolve, reject) => {
-            let q = `UPDATE jadwal SET id_kelas = $1, hari=$2, jadwal_mulai=$3, jadwal_selesai=$4, id_mapel=$5, id_ruang=$6, id_user=$7, pecahan_absen=$9 WHERE id_jadwal = $8`;
+            let q = `UPDATE jadwal SET id_kelas = $1, hari=$2, jadwal_mulai=$3, jadwal_selesai=$4, id_mapel=$5, id_ruang=$6, id_user=$7, pecahan_absen=$8 WHERE id_jadwal = $9`;
 
-             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, id_jadwal, pecahan_absen], (err, res) => {
+             db.query(q, [id_kelas, hari, jadwal_mulai, jadwal_selesai, id_mapel, id_ruang, id_user, pecahan_absen, id_jadwal], (err, res) => {
                 if(err) return reject(err);
                 else resolve(res)
              })

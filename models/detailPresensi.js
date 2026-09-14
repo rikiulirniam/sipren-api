@@ -17,8 +17,8 @@ class DetailPresensi {
   static find(id_presensi) {
     return new Promise((resolve, reject) => {
       let q = `SELECT 
-      "user".nama, 
-      siswa.nama,
+      "user".nama AS nama_guru,
+      siswa.nama AS nama,
       det_presensi.id_det, 
       det_presensi.keterangan,
       det_presensi.deskripsi_keterangan,
@@ -75,8 +75,9 @@ class DetailPresensi {
     return new Promise((resolve, reject) => {
       let q =
         `UPDATE det_presensi
-          SET keterangan = $1,
-          deskripsi_keterangan = $2
+          SET keterangan = $1::varchar,
+          deskripsi_keterangan = $2,
+          present_at = CASE WHEN $1::varchar = 'H' THEN COALESCE(present_at, CURRENT_TIMESTAMP) ELSE NULL END
           WHERE id_det = $3
           `;
 
@@ -100,7 +101,7 @@ class DetailPresensi {
 
       db.query(q, [currentDateTime, rfid, id_presensi], (err, res) => {
         if (err) reject(err);
-        else resolve(res.rows[0].nama);
+        else resolve(res.rows[0] ? res.rows[0].nama : null);
       });
     });
   }
